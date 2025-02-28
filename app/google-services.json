@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "842598993433",
+    "project_id": "tabirbaz-512c1",
+    "storage_bucket": "tabirbaz-512c1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842598993433:android:761b101ba0ec640b09e488",
+        "android_client_info": {
+          "package_name": "com.fatihaltuntas.tabirbaz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDg2dDAUf24UJOle-p8RTtLPxhDJQCFwCg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
