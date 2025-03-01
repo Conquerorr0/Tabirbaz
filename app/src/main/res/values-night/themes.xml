@@ -1,7 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Tabirbaz" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/background_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/surface_dark</item>
+        
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        
+        <!-- Button styles -->
+        <item name="materialButtonStyle">@style/Widget.App.Button.Dark</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.App.Button.Outlined.Dark</item>
+    </style>
+
+    <!-- Custom button styles for dark theme -->
+    <style name="Widget.App.Button.Dark" parent="Widget.Material3.Button">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button.Dark</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="elevation">4dp</item>
+        <item name="rippleColor">@color/ripple_dark</item>
+    </style>
+
+    <style name="Widget.App.Button.Outlined.Dark" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button.Outlined.Dark</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="rippleColor">@color/ripple_dark</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Button.Dark" parent="">
+        <item name="colorPrimary">@color/button_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Button.Outlined.Dark" parent="">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnSurface">@color/text_primary_dark</item>
+    </style>
+
+    <style name="TextAppearance.App.Button" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
 </resources>

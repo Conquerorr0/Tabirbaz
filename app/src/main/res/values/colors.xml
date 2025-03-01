@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Temel Renkler -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Ana Tema Renkleri -->
+    <color name="primary">#FF6C63FF</color>          <!-- Ana mor renk -->
+    <color name="primary_variant">#FF5C4FE1</color>  <!-- Koyu mor -->
+    <color name="secondary">#FF00B0FF</color>        <!-- Parlak mavi -->
+    <color name="secondary_variant">#FF0091EA</color><!-- Koyu mavi -->
+    
+    <!-- Arka Plan Renkleri -->
+    <color name="background_dark">#FF1A1A2E</color>  <!-- Koyu lacivert -->
+    <color name="surface_dark">#FF242442</color>     <!-- Biraz daha açık lacivert -->
+    <color name="background_light">#FFF8F9FC</color> <!-- Çok açık gri-mavi -->
+    <color name="surface_light">#FFFFFFFF</color>    <!-- Beyaz -->
+    
+    <!-- Metin Renkleri -->
+    <color name="text_primary_light">#FF2D3142</color>    <!-- Koyu gri -->
+    <color name="text_secondary_light">#FF4F5165</color>  <!-- Orta gri -->
+    <color name="text_primary_dark">#FFF8F9FC</color>     <!-- Açık gri-beyaz -->
+    <color name="text_secondary_dark">#FFB8B9C3</color>   <!-- Orta açık gri -->
+    
+    <!-- Buton Renkleri -->
+    <color name="button_primary">#FF6C63FF</color>        <!-- Ana mor renk -->
+    <color name="button_secondary">#FF00B0FF</color>      <!-- Parlak mavi -->
+    <color name="button_disabled">#FFE0E0E0</color>       <!-- Açık gri -->
+    <color name="ripple_light">#1A6C63FF</color>         <!-- Yarı saydam mor -->
+    <color name="ripple_dark">#336C63FF</color>          <!-- Yarı saydam mor (koyu tema) -->
+    
+    <!-- Durum Renkleri -->
+    <color name="success">#FF4CAF50</color>              <!-- Yeşil -->
+    <color name="error">#FFFF5252</color>                <!-- Kırmızı -->
+    <color name="warning">#FFFFAB40</color>              <!-- Turuncu -->
+    <color name="info">#FF00B0FF</color>                 <!-- Mavi -->
+
+    <!-- Gradient Renkleri -->
+    <color name="gradient_start">#FF6C63FF</color>       <!-- Mor başlangıç -->
+    <color name="gradient_end">#FF00B0FF</color>         <!-- Mavi bitiş -->
 </resources>
