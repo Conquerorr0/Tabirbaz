@@ -60,4 +60,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    
+    // ViewPager2
+    implementation(libs.androidx.viewpager2)
+    
+    // Dots Indicator
+    implementation(libs.dotsindicator)
 }

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.fatihaltuntas.tabirbaz.databinding.ActivityWelcomeBinding
+import com.fatihaltuntas.tabirbaz.view.fragments.OnboardingFragment
 
 class WelcomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWelcomeBinding
