@@ -6,11 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.fatihaltuntas.tabirbaz.R
+import com.fatihaltuntas.tabirbaz.view.adapters.OnboardingPagerAdapter
 import com.fatihaltuntas.tabirbaz.databinding.FragmentOnboardingBinding
+import com.fatihaltuntas.tabirbaz.model.OnboardingPage
 
 class OnboardingFragment : Fragment() {
     private var _binding: FragmentOnboardingBinding? = null
     private val binding get() = _binding!!
+    private lateinit var pagerAdapter: OnboardingPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,7 +32,28 @@ class OnboardingFragment : Fragment() {
     }
 
     private fun setupViewPager() {
-        // ViewPager2 adapter'ı burada ayarlanacak
+        val pages = listOf(
+            OnboardingPage(
+                R.drawable.ic_onboarding_1,
+                R.string.onboarding_title_1,
+                R.string.onboarding_desc_1
+            ),
+            OnboardingPage(
+                R.drawable.ic_onboarding_2,
+                R.string.onboarding_title_2,
+                R.string.onboarding_desc_2
+            ),
+            OnboardingPage(
+                R.drawable.ic_onboarding_3,
+                R.string.onboarding_title_3,
+                R.string.onboarding_desc_3
+            )
+        )
+
+        pagerAdapter = OnboardingPagerAdapter(pages)
+        binding.viewPager.adapter = pagerAdapter
+        binding.dotsIndicator.attachTo(binding.viewPager)
+
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -50,9 +75,9 @@ class OnboardingFragment : Fragment() {
 
     private fun updateNextButtonText(position: Int) {
         binding.btnNext.text = if (position == 2) {
-            getString(com.fatihaltuntas.tabirbaz.R.string.get_started)
+            getString(R.string.get_started)
         } else {
-            getString(com.fatihaltuntas.tabirbaz.R.string.next)
+            getString(R.string.next)
         }
     }
 
