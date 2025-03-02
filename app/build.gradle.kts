@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.fatihaltuntas.tabirbaz"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.fatihaltuntas.tabirbaz"
