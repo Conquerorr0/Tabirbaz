@@ -1,6 +1,5 @@
 package com.fatihaltuntas.tabirbaz.view.fragments.auth
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fatihaltuntas.tabirbaz.R
-import com.fatihaltuntas.tabirbaz.databinding.FragmentLoginBinding
-import com.fatihaltuntas.tabirbaz.view.activities.MainActivity
+import com.fatihaltuntas.tabirbaz.databinding.FragmentForgotPasswordBinding
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
 
-class LoginFragment : Fragment() {
-    private var _binding: FragmentLoginBinding? = null
+class ForgotPasswordFragment : Fragment() {
+    private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AuthViewModel by viewModels()
 
@@ -24,7 +22,7 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -35,13 +33,6 @@ class LoginFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.currentUser.observe(viewLifecycleOwner) { user ->
-            user?.let {
-                // Kullanıcı giriş yaptığında ana ekrana yönlendir
-                findNavController().navigate(R.id.action_login_to_main)
-            }
-        }
-
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
@@ -50,23 +41,19 @@ class LoginFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.btnLogin.setOnClickListener {
+        binding.btnResetPassword.setOnClickListener {
             val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
-
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.signIn(email, password)
+            if (email.isNotEmpty()) {
+                viewModel.resetPassword(email)
+                Toast.makeText(requireContext(), getString(R.string.reset_password_sent), Toast.LENGTH_LONG).show()
+                findNavController().navigateUp()
             } else {
-                Toast.makeText(requireContext(), getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.enter_email), Toast.LENGTH_SHORT).show()
             }
         }
 
-        binding.tvRegister.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_register)
-        }
-
-        binding.tvForgotPassword.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_forgotPassword)
+        binding.btnBack.setOnClickListener {
+            findNavController().navigateUp()
         }
     }
 
@@ -74,4 +61,4 @@ class LoginFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-}
+} 

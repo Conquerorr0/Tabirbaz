@@ -46,6 +46,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.ForgotPasswordFragment"
+        android:label="@string/forgot_password_title"
+        tools:layout="@layout/fragment_forgot_password" />
+
+    <fragment
         android:id="@+id/loginFragment"
         android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.LoginFragment"
         android:label="@string/login"
@@ -60,6 +66,10 @@
             app:destination="@id/mainActivity"
             app:popUpTo="@id/welcomeActivity"
             app:popUpToInclusive="true" />
+            
+        <action
+            android:id="@+id/action_login_to_forgotPassword"
+            app:destination="@id/forgotPasswordFragment" />
     </fragment>
 
     <fragment

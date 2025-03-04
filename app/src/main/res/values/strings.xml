@@ -72,4 +72,10 @@
     <string name="passwords_not_match">Şifreler eşleşmiyor</string>
     <string name="reset_password_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi</string>
     <string name="enter_email">Lütfen e-posta adresinizi girin</string>
+
+    <!-- Forgot Password Screen -->
+    <string name="forgot_password_title">Şifrenizi mi Unuttunuz?</string>
+    <string name="forgot_password_subtitle">E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim</string>
+    <string name="reset_password">Şifremi Sıfırla</string>
+    <string name="back">Geri</string>
 </resources>
