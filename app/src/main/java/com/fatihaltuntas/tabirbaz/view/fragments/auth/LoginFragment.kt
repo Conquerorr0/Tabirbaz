@@ -6,72 +6,105 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentLoginBinding
-import com.fatihaltuntas.tabirbaz.view.activities.MainActivity
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
 
 class LoginFragment : Fragment() {
-    private var _binding: FragmentLoginBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: AuthViewModel by viewModels()
+    private lateinit var binding: FragmentLoginBinding
+    private lateinit var viewModel: AuthViewModel
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                viewModel.signInWithGoogle(account)
+            } catch (e: ApiException) {
+                viewModel.setError(e.message ?: getString(R.string.error_unknown))
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupObservers()
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        
+        setupGoogleSignIn()
         setupClickListeners()
+        setupObservers()
+    }
+
+    private fun setupGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+    }
+
+    private fun setupClickListeners() {
+        with(binding) {
+            btnLogin.setOnClickListener {
+                val email = etEmail.text.toString()
+                val password = etPassword.text.toString()
+                viewModel.signInWithEmailAndPassword(email, password)
+            }
+
+            btnGoogleSignIn.setOnClickListener {
+                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            }
+
+            tvForgotPassword.setOnClickListener {
+                findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
+            }
+
+            tvRegister.setOnClickListener {
+                findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+            }
+        }
     }
 
     private fun setupObservers() {
         viewModel.currentUser.observe(viewLifecycleOwner) { user ->
             user?.let {
-                // Kullanıcı giriş yaptığında ana ekrana yönlendir
-                findNavController().navigate(R.id.action_login_to_main)
+                if (!user.isEmailVerified) {
+                    findNavController().navigate(R.id.action_loginFragment_to_emailVerificationFragment)
+                } else {
+                    // Navigate to main screen
+                }
             }
+        }
+
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            binding.loadingAnimation.isVisible = isLoading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
             }
         }
-    }
-
-    private fun setupClickListeners() {
-        binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
-
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.signIn(email, password)
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        binding.tvRegister.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_register)
-        }
-
-        binding.tvForgotPassword.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_forgotPassword)
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

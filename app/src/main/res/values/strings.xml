@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Tabirbaz</string>
 
+    <!-- Config -->
+    <string name="web_client_id">YOUR_WEB_CLIENT_ID</string>
+
     <!-- Welcome Screen -->
     <string name="welcome">Tabirbaz\'a Hoş Geldiniz</string>
     <string name="welcome_description">Rüyalarınızı yapay zeka ile yorumlayın</string>
@@ -23,6 +26,66 @@
     <string name="register_subtitle">Yeni bir hesap oluşturun</string>
     <string name="already_have_account">Zaten hesabınız var mı? Giriş yapın</string>
 
+    <!-- Forgot Password Screen -->
+    <string name="forgot_password_title">Şifrenizi mi Unuttunuz?</string>
+    <string name="forgot_password_subtitle">E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim</string>
+    <string name="reset_password">Şifremi Sıfırla</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">E-posta Doğrulama</string>
+    <string name="email_verification_message">Hesabınızı aktifleştirmek için e-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
+    <string name="email_verification_sent">Doğrulama e-postası gönderildi</string>
+    <string name="email_verification_required">Lütfen önce e-posta adresinizi doğrulayın</string>
+    <string name="resend_verification_email">Doğrulama E-postasını Tekrar Gönder</string>
+    <string name="continue_button">Devam Et</string>
+
+    <!-- Profile Completion -->
+    <string name="complete_profile">Profili Tamamla</string>
+    <string name="name_hint">Ad Soyad</string>
+    <string name="select_birth_date">Doğum Tarihi Seç</string>
+    <string name="gender_label">Cinsiyet</string>
+    <string name="gender_male">Erkek</string>
+    <string name="gender_female">Kadın</string>
+    <string name="gender_other">Diğer</string>
+    <string name="name_required">Lütfen adınızı girin</string>
+    <string name="birth_date_required">Lütfen doğum tarihinizi seçin</string>
+    <string name="gender_required">Lütfen cinsiyetinizi seçin</string>
+    <string name="complete_button">Tamamla</string>
+    <string name="profile_completion_success">Profiliniz başarıyla güncellendi</string>
+
+    <!-- Social Login -->
+    <string name="or">veya</string>
+    <string name="continue_with_google">Google ile Devam Et</string>
+    <string name="no_account_register">Hesabınız yok mu? Kayıt olun</string>
+
+    <!-- Common -->
+    <string name="loading">Yükleniyor…</string>
+    <string name="error">Hata</string>
+    <string name="success">Başarılı</string>
+    <string name="cancel">İptal</string>
+    <string name="save">Kaydet</string>
+    <string name="back">Geri</string>
+
+    <!-- Messages -->
+    <string name="fill_all_fields">Lütfen tüm alanları doldurun</string>
+    <string name="passwords_not_match">Şifreler eşleşmiyor</string>
+    <string name="reset_password_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi</string>
+    <string name="enter_email">Lütfen e-posta adresinizi girin</string>
+
+    <!-- Security -->
+    <string name="captcha_required">Güvenlik doğrulaması gerekli</string>
+    <string name="too_many_attempts">Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="suspicious_activity">Şüpheli aktivite tespit edildi</string>
+    <string name="verify_its_you">Bu siz olduğunuzu doğrulayın</string>
+    <string name="remember_me">Beni Hatırla</string>
+    <string name="session_expired">Oturumunuz sona erdi</string>
+
+    <!-- Navigation -->
+    <string name="home">Ana Sayfa</string>
+    <string name="profile">Profil</string>
+    <string name="settings">Ayarlar</string>
+    <string name="logout">Çıkış Yap</string>
+
     <!-- Onboarding -->
     <string name="next">İleri</string>
     <string name="skip">Atla</string>
@@ -33,13 +96,6 @@
     <string name="onboarding_title_3">Rüya Günlüğü</string>
     <string name="onboarding_desc_3">Rüya günlüğünüzü oluşturun ve geçmiş yorumlarınızı takip edin</string>
     <string name="finish">Başla</string>
-
-    <!-- Common -->
-    <string name="loading">Yükleniyor…</string>
-    <string name="error">Hata</string>
-    <string name="success">Başarılı</string>
-    <string name="cancel">İptal</string>
-    <string name="save">Kaydet</string>
 
     <!-- Dream Entry -->
     <string name="dream_entry_title">Rüyanızı Girin</string>
@@ -53,29 +109,5 @@
     <string name="style_psychological">Psikolojik</string>
     <string name="style_symbolic">Sembolik</string>
     <string name="style_spiritual">Spiritüel</string>
-
-    <!-- Profile -->
-    <string name="profile">Profil</string>
-    <string name="settings">Ayarlar</string>
-    <string name="logout">Çıkış Yap</string>
-
-    <!-- Navigation -->
-    <string name="home">Ana Sayfa</string>
-    <string name="favorites">Favoriler</string>
-    <string name="history">Geçmiş</string>
-    <string name="search">Ara</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <!-- Messages -->
-    <string name="fill_all_fields">Lütfen tüm alanları doldurun</string>
-    <string name="passwords_not_match">Şifreler eşleşmiyor</string>
-    <string name="reset_password_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi</string>
-    <string name="enter_email">Lütfen e-posta adresinizi girin</string>
-
-    <!-- Forgot Password Screen -->
-    <string name="forgot_password_title">Şifrenizi mi Unuttunuz?</string>
-    <string name="forgot_password_subtitle">E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim</string>
-    <string name="reset_password">Şifremi Sıfırla</string>
-    <string name="back">Geri</string>
+    <string name="app_logo_desc">Uygulama Logosu</string>
 </resources>

@@ -12,7 +12,20 @@
           "package_name": "com.fatihaltuntas.tabirbaz"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "842598993433-gu0e6d57eloj8mdehqebkrufb0957qee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fatihaltuntas.tabirbaz",
+            "certificate_hash": "2a7a83efb5d10034cd997f5d15ffbc182ac45ca2"
+          }
+        },
+        {
+          "client_id": "842598993433-h8abc6b44fd3soaekls28qjl0ptqmkjd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDg2dDAUf24UJOle-p8RTtLPxhDJQCFwCg"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "842598993433-h8abc6b44fd3soaekls28qjl0ptqmkjd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

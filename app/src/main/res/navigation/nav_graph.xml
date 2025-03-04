@@ -70,6 +70,10 @@
         <action
             android:id="@+id/action_login_to_forgotPassword"
             app:destination="@id/forgotPasswordFragment" />
+
+        <action
+            android:id="@+id/action_login_to_emailVerification"
+            app:destination="@id/emailVerificationFragment" />
     </fragment>
 
     <fragment
@@ -83,6 +87,28 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/registerFragment"
             app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_register_to_emailVerification"
+            app:destination="@id/emailVerificationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/emailVerificationFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.EmailVerificationFragment"
+        android:label="EmailVerificationFragment">
+        <action
+            android:id="@+id/action_emailVerification_to_profileCompletion"
+            app:destination="@id/profileCompletionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileCompletionFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.ProfileCompletionFragment"
+        android:label="ProfileCompletionFragment">
+        <action
+            android:id="@+id/action_profileCompletionFragment_to_mainActivity"
+            app:destination="@id/mainActivity" />
     </fragment>
 
 </navigation>

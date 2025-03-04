@@ -3,6 +3,7 @@ agp = "8.5.2"
 comSquareupRetrofit2Retrofit3 = "2.9.0"
 converterGson = "2.9.0"
 dotsindicator = "5.0"
+facebookLogin = "16.3.0"
 firebaseBom = "32.1.1"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
@@ -11,12 +12,14 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 kotlinxCoroutinesCore = "1.5.2"
+lottie = "6.3.0"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 navigationFragment = "2.8.8"
 navigationFragmentKtx = "2.8.8"
 navigationUiKtx = "2.8.8"
+playServicesAuth = "20.7.0"
 viewpager2 = "1.0.0"
 
 [libraries]
@@ -26,6 +29,7 @@ androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 com-squareup-retrofit2-retrofit4 = { module = "com.squareup.retrofit2:retrofit", version.ref = "comSquareupRetrofit2Retrofit3" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
+facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookLogin" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
@@ -35,9 +39,11 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
