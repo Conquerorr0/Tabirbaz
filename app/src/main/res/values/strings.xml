@@ -1,12 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Tabirbaz</string>
 
     <!-- Welcome Screen -->
-    <string name="welcome">Hoş Geldiniz</string>
+    <string name="welcome">Tabirbaz\'a Hoş Geldiniz</string>
     <string name="welcome_description">Rüyalarınızı yapay zeka ile yorumlayın</string>
-    <string name="welcome_subtitle">Yapay zeka destekli rüya yorumları ile bilinçaltınızı keşfedin</string>
+    <string name="welcome_subtitle">Rüyalarınızı keşfedin ve anlamlandırın</string>
     <string name="get_started">Hadi Başlayalım</string>
     <string name="create_account">Hesap Oluştur</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">Tekrar Hoş Geldiniz</string>
+    <string name="login_subtitle">Rüya dünyasına giriş yapın</string>
+    <string name="email">E-posta</string>
+    <string name="password">Şifre</string>
+    <string name="confirm_password">Şifreyi Tekrar Girin</string>
+    <string name="forgot_password">Şifremi Unuttum</string>
+    <string name="login">Giriş Yap</string>
+    <string name="dont_have_account">Hesabınız yok mu? Hemen oluşturun</string>
+
+    <!-- Register Screen -->
+    <string name="register_subtitle">Yeni bir hesap oluşturun</string>
+    <string name="already_have_account">Zaten hesabınız var mı? Giriş yapın</string>
 
     <!-- Onboarding -->
     <string name="next">İleri</string>
@@ -17,6 +32,7 @@
     <string name="onboarding_desc_2">Rüyalarınızı yapay zeka teknolojisi ile anlamlandırın</string>
     <string name="onboarding_title_3">Rüya Günlüğü</string>
     <string name="onboarding_desc_3">Rüya günlüğünüzü oluşturun ve geçmiş yorumlarınızı takip edin</string>
+    <string name="finish">Başla</string>
 
     <!-- Common -->
     <string name="loading">Yükleniyor…</string>
@@ -50,4 +66,10 @@
     <string name="search">Ara</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Messages -->
+    <string name="fill_all_fields">Lütfen tüm alanları doldurun</string>
+    <string name="passwords_not_match">Şifreler eşleşmiyor</string>
+    <string name="reset_password_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi</string>
+    <string name="enter_email">Lütfen e-posta adresinizi girin</string>
 </resources>

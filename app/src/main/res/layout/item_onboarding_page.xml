@@ -7,17 +7,19 @@
     android:background="@color/background_dark">
 
     <ImageView
-        android:id="@+id/ivIllustration"
+        android:id="@+id/ivOnboarding"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="32dp"
         android:contentDescription="@null"
-        app:layout_constraintBottom_toTopOf="@+id/tvTitle"
+        app:layout_constraintBottom_toTopOf="@id/tvTitle"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:src="@tools:sample/avatars"
         tools:srcCompat="@drawable/ic_onboarding_1" />
 
@@ -25,14 +27,17 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
         android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:textAlignment="center"
         android:textColor="@color/text_primary_dark"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium"
-        app:layout_constraintBottom_toTopOf="@+id/tvDescription"
+        app:layout_constraintBottom_toTopOf="@id/tvDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivOnboarding"
         tools:text="@string/onboarding_title_1" />
 
     <TextView
@@ -40,14 +45,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="sans-serif"
         android:gravity="center"
+        android:textAlignment="center"
         android:textColor="@color/text_secondary_dark"
         android:textSize="16sp"
-        android:fontFamily="sans-serif"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
         tools:text="@string/onboarding_desc_1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

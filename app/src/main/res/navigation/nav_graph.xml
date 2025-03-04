@@ -20,6 +20,10 @@
         <action
             android:id="@+id/action_welcome_to_onboarding"
             app:destination="@id/onboardingFragment" />
+
+        <action
+            android:id="@+id/action_welcome_to_register"
+            app:destination="@id/registerFragment" />
     </activity>
 
     <activity
@@ -32,6 +36,43 @@
         android:id="@+id/onboardingFragment"
         android:name="com.fatihaltuntas.tabirbaz.view.fragments.OnboardingFragment"
         android:label="@string/create_account"
-        tools:layout="@layout/fragment_onboarding" />
+        tools:layout="@layout/fragment_onboarding">
+        
+        <action
+            android:id="@+id/action_onboarding_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/onboardingFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.LoginFragment"
+        android:label="@string/login"
+        tools:layout="@layout/fragment_login">
+        
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+            
+        <action
+            android:id="@+id/action_login_to_main"
+            app:destination="@id/mainActivity"
+            app:popUpTo="@id/welcomeActivity"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.RegisterFragment"
+        android:label="@string/create_account"
+        tools:layout="@layout/fragment_register">
+        
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/registerFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

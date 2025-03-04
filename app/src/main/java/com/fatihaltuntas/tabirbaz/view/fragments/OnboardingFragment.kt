@@ -5,16 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.view.adapters.OnboardingPagerAdapter
 import com.fatihaltuntas.tabirbaz.databinding.FragmentOnboardingBinding
-import com.fatihaltuntas.tabirbaz.model.OnboardingPage
+import com.fatihaltuntas.tabirbaz.viewmodel.OnboardingViewModel
 
 class OnboardingFragment : Fragment() {
     private var _binding: FragmentOnboardingBinding? = null
     private val binding get() = _binding!!
-    private lateinit var pagerAdapter: OnboardingPagerAdapter
+    private val viewModel: OnboardingViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,56 +30,33 @@ class OnboardingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
-        setupClickListeners()
+        setupObservers()
     }
 
     private fun setupViewPager() {
-        val pages = listOf(
-            OnboardingPage(
-                R.drawable.ic_onboarding_1,
-                R.string.onboarding_title_1,
-                R.string.onboarding_desc_1
-            ),
-            OnboardingPage(
-                R.drawable.ic_onboarding_2,
-                R.string.onboarding_title_2,
-                R.string.onboarding_desc_2
-            ),
-            OnboardingPage(
-                R.drawable.ic_onboarding_3,
-                R.string.onboarding_title_3,
-                R.string.onboarding_desc_3
-            )
-        )
-
-        pagerAdapter = OnboardingPagerAdapter(pages)
-        binding.viewPager.adapter = pagerAdapter
-        binding.dotsIndicator.attachTo(binding.viewPager)
+        val adapter = OnboardingPagerAdapter()
+        binding.viewPager.adapter = adapter
+        binding.dotsIndicator.setViewPager2(binding.viewPager)
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                updateNextButtonText(position)
+                viewModel.setCurrentPage(position, adapter.itemCount)
             }
         })
     }
 
-    private fun setupClickListeners() {
-        binding.btnNext.setOnClickListener {
-            val currentItem = binding.viewPager.currentItem
-            if (currentItem < 2) { // Son sayfada değilse
-                binding.viewPager.currentItem = currentItem + 1
-            } else { // Son sayfadaysa
-                // TODO: Kayıt ekranına geçiş yapılacak
+    private fun setupObservers() {
+        viewModel.isLastPage.observe(viewLifecycleOwner) { isLast ->
+            binding.btnNext.apply {
+                text = if (isLast) getString(R.string.finish) else getString(R.string.next)
+                setOnClickListener {
+                    if (isLast) {
+                        findNavController().navigate(R.id.action_onboarding_to_login)
+                    } else {
+                        binding.viewPager.currentItem = binding.viewPager.currentItem + 1
+                    }
+                }
             }
-        }
-    }
-
-    private fun updateNextButtonText(position: Int) {
-        binding.btnNext.text = if (position == 2) {
-            getString(R.string.get_started)
-        } else {
-            getString(R.string.next)
         }
     }
 

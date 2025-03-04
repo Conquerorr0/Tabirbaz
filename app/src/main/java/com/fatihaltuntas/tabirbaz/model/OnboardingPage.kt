@@ -1,7 +1,10 @@
 package com.fatihaltuntas.tabirbaz.model
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+
 data class OnboardingPage(
-    val imageResId: Int,
-    val titleResId: Int,
-    val descriptionResId: Int
+    @DrawableRes val imageRes: Int,
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int
 ) 
