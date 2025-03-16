@@ -20,4 +20,9 @@
         <item name="android:padding">16dp</item>
         <item name="rippleColor">@color/ripple_dark</item>
     </style>
+
+    <style name="circleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources> 

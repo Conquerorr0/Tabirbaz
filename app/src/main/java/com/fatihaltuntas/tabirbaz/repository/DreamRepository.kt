@@ -1,18 +1,21 @@
 package com.fatihaltuntas.tabirbaz.repository
 
 import com.fatihaltuntas.tabirbaz.model.Dream
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
+import java.util.Date
 
-class DreamRepository {
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    private val dreamsCollection = db.collection("dreams")
-    private val categoriesCollection = db.collection("categories")
+class DreamRepository(
+    private val firestore: FirebaseFirestore,
+    private val auth: FirebaseAuth
+) {
+    private val dreamsCollection = firestore.collection("dreams")
+    private val categoriesCollection = firestore.collection("categories")
     
     // Kullanıcının kendi rüyalarını getir
     suspend fun getUserDreams(limit: Int = 10): List<Dream> {
@@ -70,9 +73,14 @@ class DreamRepository {
     }
     
     // Rüya detayı
-    suspend fun getDreamById(dreamId: String): Dream? {
-        val documentSnapshot = dreamsCollection.document(dreamId).get().await()
-        return documentSnapshot.toObject(Dream::class.java)
+    suspend fun getDreamById(dreamId: String): Dream {
+        val document = dreamsCollection.document(dreamId).get().await()
+        if (document.exists()) {
+            val dream = document.toObject(Dream::class.java) ?: throw Exception("Rüya verisi dönüştürülemedi")
+            return dream
+        } else {
+            throw Exception("Rüya bulunamadı")
+        }
     }
     
     // Rüya görüntülenme sayısını artır
@@ -83,11 +91,13 @@ class DreamRepository {
     }
     
     // Yeni rüya ekle
-    suspend fun addDream(dream: Dream): String {
+    suspend fun addDream(dream: Dream): Dream {
         val dreamData = dream.toMap()
         val documentRef = dreamsCollection.document()
         documentRef.set(dreamData).await()
-        return documentRef.id
+        
+        // Firestore işlem tamamlandıktan sonra yeni ID ile birlikte Dream nesnesini döndür
+        return dream.copy(id = documentRef.id)
     }
     
     // Rüya güncelle
@@ -99,5 +109,26 @@ class DreamRepository {
     // Rüya sil
     suspend fun deleteDream(dreamId: String) {
         dreamsCollection.document(dreamId).delete().await()
+    }
+
+    suspend fun getCategories(): List<String> {
+        val querySnapshot = categoriesCollection.get().await()
+        return querySnapshot.documents.mapNotNull { doc ->
+            doc.getString("name")
+        }
+    }
+
+    fun getCurrentUserId(): String? {
+        return auth.currentUser?.uid
+    }
+
+    // Timestamp'i Date'e çevirmek için yardımcı metot
+    fun timestampToDate(timestamp: Timestamp): Date {
+        return timestamp.toDate()
+    }
+
+    // Date'i Timestamp'e çevirmek için yardımcı metot
+    fun dateToTimestamp(date: Date): Timestamp {
+        return Timestamp(date)
     }
 } 
