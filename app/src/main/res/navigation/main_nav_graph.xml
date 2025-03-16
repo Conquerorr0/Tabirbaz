@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.home.HomeFragment"
+        android:label="@string/home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_dreamDetailFragment"
+            app:destination="@id/dreamDetailFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addDreamFragment"
+            app:destination="@id/addDreamFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_categoryDreamsFragment"
+            app:destination="@id/categoryDreamsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.explore.ExploreFragment"
+        android:label="@string/explore"
+        tools:layout="@layout/fragment_explore">
+        <action
+            android:id="@+id/action_exploreFragment_to_dreamDetailFragment"
+            app:destination="@id/dreamDetailFragment" />
+        <action
+            android:id="@+id/action_exploreFragment_to_searchResultsFragment"
+            app:destination="@id/searchResultsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addDreamFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.dream.AddDreamFragment"
+        android:label="@string/add_dream"
+        tools:layout="@layout/fragment_add_dream">
+        <action
+            android:id="@+id/action_addDreamFragment_to_dreamResultFragment"
+            app:destination="@id/dreamResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myDreamsFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.dream.MyDreamsFragment"
+        android:label="@string/my_dreams"
+        tools:layout="@layout/fragment_my_dreams">
+        <action
+            android:id="@+id/action_myDreamsFragment_to_dreamDetailFragment"
+            app:destination="@id/dreamDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.profile.ProfileFragment"
+        android:label="@string/profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dreamDetailFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.dream.DreamDetailFragment"
+        android:label="fragment_dream_detail"
+        tools:layout="@layout/fragment_dream_detail">
+        <argument
+            android:name="dreamId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dreamResultFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.dream.DreamResultFragment"
+        android:label="fragment_dream_result"
+        tools:layout="@layout/fragment_dream_result">
+        <argument
+            android:name="dreamId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryDreamsFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.dream.CategoryDreamsFragment"
+        android:label="fragment_category_dreams"
+        tools:layout="@layout/fragment_category_dreams">
+        <argument
+            android:name="categoryId"
+            app:argType="string" />
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchResultsFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.search.SearchResultsFragment"
+        android:label="fragment_search_results"
+        tools:layout="@layout/fragment_search_results">
+        <argument
+            android:name="query"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.settings.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation> 

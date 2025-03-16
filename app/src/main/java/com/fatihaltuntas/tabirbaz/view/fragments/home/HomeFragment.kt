@@ -1,0 +1,109 @@
+package com.fatihaltuntas.tabirbaz.view.fragments.home
+
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.fatihaltuntas.tabirbaz.R
+import com.fatihaltuntas.tabirbaz.databinding.FragmentHomeBinding
+
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
+
+/**
+ * A simple [Fragment] subclass.
+ * Use the [HomeFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class HomeFragment : Fragment() {
+    // TODO: Rename and change types of parameters
+    private var param1: String? = null
+    private var param2: String? = null
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupClickListeners()
+        // TODO: Daha sonra kategorileri, günün tabirini ve rüya listelerini yükleyeceğiz
+    }
+
+    private fun setupClickListeners() {
+        // Arama kartına tıklama
+        binding.cardSearch.setOnClickListener {
+            // TODO: Arama ekranına yönlendirme eklenecek
+        }
+
+        // Profil butonuna tıklama
+        binding.btnProfile.setOnClickListener {
+            navigateToBottomNavDestination(R.id.profileFragment)
+        }
+
+        // "Tümünü Gör" butonlarına tıklama
+        binding.tvSeeAllRecent.setOnClickListener {
+            navigateToBottomNavDestination(R.id.myDreamsFragment)
+        }
+
+        binding.tvSeeAllPopular.setOnClickListener {
+            navigateToBottomNavDestination(R.id.exploreFragment)
+        }
+
+        // Yeni rüya ekleme butonuna tıklama
+        binding.fabAddDream.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_addDreamFragment)
+        }
+
+        // Son eklenen ve popüler rüyaların henüz adapter'ları yok, ileride ekleyeceğiz
+    }
+
+    private fun navigateToBottomNavDestination(destinationId: Int) {
+        val navController = findNavController()
+        navController.navigate(destinationId)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment HomeFragment.
+         */
+        // TODO: Rename and change types and number of parameters
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            HomeFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+    }
+}

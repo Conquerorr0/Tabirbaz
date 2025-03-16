@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/exploreFragment"
+        android:icon="@drawable/ic_explore"
+        android:title="@string/explore" />
+    <item
+        android:id="@+id/addDreamFragment"
+        android:icon="@drawable/ic_add_circle"
+        android:title="@string/add_dream" />
+    <item
+        android:id="@+id/myDreamsFragment"
+        android:icon="@drawable/ic_dreams"
+        android:title="@string/my_dreams" />
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/profile" />
+</menu> 

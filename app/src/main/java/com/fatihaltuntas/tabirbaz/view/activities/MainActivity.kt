@@ -1,50 +1,51 @@
 package com.fatihaltuntas.tabirbaz.view.activities
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.fatihaltuntas.tabirbaz.TabirbazApplication
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.ActivityMainBinding
-import com.fatihaltuntas.tabirbaz.util.SessionManager
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var auth: FirebaseAuth
-    private lateinit var sessionManager: SessionManager
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // SessionManager ve Firebase Auth'u başlat
-        sessionManager = (application as TabirbazApplication).sessionManager
-        auth = FirebaseAuth.getInstance()
-        
-        // Oturum durumunu kontrol et
-        checkUserSession()
-        
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        setupNavigation()
         setupWindowInsets()
     }
     
-    private fun checkUserSession() {
-        // Kullanıcı oturum açmamışsa, giriş ekranına yönlendir
-        if (auth.currentUser == null || !sessionManager.isLoggedIn()) {
-            navigateToWelcomeActivity()
-            return
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        
+        // BottomNavigationView ile NavController'ı bağlama
+        binding.bottomNavigationView.setupWithNavController(navController)
+        
+        // Orta butona özel işlem eklemek isterseniz
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            if (item.itemId == R.id.addDreamFragment) {
+                // FAB tarzında davranış için doğrudan navigasyon yapabiliriz
+                navController.navigate(R.id.addDreamFragment)
+                true
+            } else {
+                // Diğer destinasyonlar için normal navigasyon
+                navController.navigate(item.itemId)
+                true
+            }
         }
-    }
-    
-    private fun navigateToWelcomeActivity() {
-        val intent = Intent(this, WelcomeActivity::class.java)
-        startActivity(intent)
-        finish() // Bu aktiviteyi kapat
     }
     
     private fun setupWindowInsets() {

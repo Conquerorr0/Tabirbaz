@@ -66,6 +66,9 @@ dependencies {
     // Dots Indicator
     implementation("com.tbuonomo:dotsindicator:5.0")
     
+    // CircleImageView
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+    
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
