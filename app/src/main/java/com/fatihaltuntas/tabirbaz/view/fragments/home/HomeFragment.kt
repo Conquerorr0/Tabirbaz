@@ -1,38 +1,32 @@
 package com.fatihaltuntas.tabirbaz.view.fragments.home
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentHomeBinding
+import com.fatihaltuntas.tabirbaz.view.adapters.DreamCategoryAdapter
+import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
+import com.fatihaltuntas.tabirbaz.viewmodel.HomeViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    
+    private val viewModel: HomeViewModel by viewModels()
+    private lateinit var categoryAdapter: DreamCategoryAdapter
+    private lateinit var recentDreamsAdapter: DreamAdapter
+    private lateinit var popularDreamsAdapter: DreamAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -45,65 +39,130 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        setupAdapters()
+        setupObservers()
         setupClickListeners()
-        // TODO: Daha sonra kategorileri, günün tabirini ve rüya listelerini yükleyeceğiz
+        
+        // Ana sayfa verilerini yükle
+        viewModel.loadHomeData()
     }
-
-    private fun setupClickListeners() {
-        // Arama kartına tıklama
-        binding.cardSearch.setOnClickListener {
-            // TODO: Arama ekranına yönlendirme eklenecek
+    
+    private fun setupAdapters() {
+        // Kategori adaptörü
+        categoryAdapter = DreamCategoryAdapter { category ->
+            // Kategori tıklandığında kategori detay sayfasına git
+            val action = HomeFragmentDirections.actionHomeFragmentToCategoryDreamsFragment(
+                categoryId = category.id,
+                categoryName = category.name
+            )
+            findNavController().navigate(action)
         }
-
-        // Profil butonuna tıklama
+        binding.rvCategories.apply {
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            adapter = categoryAdapter
+        }
+        
+        // Son rüyalar adaptörü
+        recentDreamsAdapter = DreamAdapter { dream ->
+            // Rüya tıklandığında rüya detay sayfasına git
+            val action = HomeFragmentDirections.actionHomeFragmentToDreamDetailFragment(dreamId = dream.id)
+            findNavController().navigate(action)
+        }
+        binding.rvRecentDreams.apply {
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            adapter = recentDreamsAdapter
+        }
+        
+        // Popüler rüyalar adaptörü
+        popularDreamsAdapter = DreamAdapter { dream ->
+            // Rüya tıklandığında rüya detay sayfasına git
+            val action = HomeFragmentDirections.actionHomeFragmentToDreamDetailFragment(dreamId = dream.id)
+            findNavController().navigate(action)
+        }
+        binding.rvPopularDreams.apply {
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            adapter = popularDreamsAdapter
+        }
+    }
+    
+    private fun setupObservers() {
+        // Kategorileri izle
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+            categoryAdapter.submitList(categories)
+        }
+        
+        // Günün rüyasını izle
+        viewModel.featuredDream.observe(viewLifecycleOwner) { dream ->
+            dream?.let {
+                binding.tvDailyDreamTitle.text = it.title
+                binding.tvDailyDreamInterpretation.text = it.interpretation
+                binding.cardDailyDream.setOnClickListener { _ ->
+                    val action = HomeFragmentDirections.actionHomeFragmentToDreamDetailFragment(dreamId = it.id)
+                    findNavController().navigate(action)
+                }
+            }
+        }
+        
+        // Son rüyaları izle
+        viewModel.recentDreams.observe(viewLifecycleOwner) { dreams ->
+            recentDreamsAdapter.submitList(dreams)
+            // XML'de emptyViewRecentDreams olmadığı için şimdilik kaldırıldı
+            // Boş durum görünümü eklendiğinde bu kısım güncellenecek
+        }
+        
+        // Popüler rüyaları izle
+        viewModel.popularDreams.observe(viewLifecycleOwner) { dreams ->
+            popularDreamsAdapter.submitList(dreams)
+        }
+        
+        // Yükleme durumunu izle
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            // XML'de progressBar olmadığı için şimdilik kaldırıldı
+            // Yükleme göstergesi eklendiğinde bu kısım güncellenecek
+        }
+        
+        // Hata durumunu izle
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
+            }
+        }
+    }
+    
+    private fun setupClickListeners() {
+        // Arama kutusuna tıklandığında arama sayfasına git
+        binding.cardSearch.setOnClickListener {
+            // TODO: Arama sayfasına yönlendir
+        }
+        
+        // Profil resmine tıklandığında profil sayfasına git
         binding.btnProfile.setOnClickListener {
             navigateToBottomNavDestination(R.id.profileFragment)
         }
-
-        // "Tümünü Gör" butonlarına tıklama
+        
+        // "Tümünü Gör" butonlarına tıklandığında ilgili sayfaya git
         binding.tvSeeAllRecent.setOnClickListener {
             navigateToBottomNavDestination(R.id.myDreamsFragment)
         }
-
+        
         binding.tvSeeAllPopular.setOnClickListener {
             navigateToBottomNavDestination(R.id.exploreFragment)
         }
-
-        // Yeni rüya ekleme butonuna tıklama
+        
+        // Rüya ekle butonuna tıklandığında rüya ekleme sayfasına git
         binding.fabAddDream.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_addDreamFragment)
+            navigateToBottomNavDestination(R.id.addDreamFragment)
         }
-
-        // Son eklenen ve popüler rüyaların henüz adapter'ları yok, ileride ekleyeceğiz
     }
-
+    
     private fun navigateToBottomNavDestination(destinationId: Int) {
-        val navController = findNavController()
-        navController.navigate(destinationId)
+        findNavController().navigate(destinationId)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }
