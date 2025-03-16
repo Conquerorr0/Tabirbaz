@@ -9,14 +9,17 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.fatihaltuntas.tabirbaz.R
+import com.fatihaltuntas.tabirbaz.TabirbazApplication
 import com.fatihaltuntas.tabirbaz.view.adapters.OnboardingPagerAdapter
 import com.fatihaltuntas.tabirbaz.databinding.FragmentOnboardingBinding
+import com.fatihaltuntas.tabirbaz.util.SessionManager
 import com.fatihaltuntas.tabirbaz.viewmodel.OnboardingViewModel
 
 class OnboardingFragment : Fragment() {
     private var _binding: FragmentOnboardingBinding? = null
     private val binding get() = _binding!!
     private val viewModel: OnboardingViewModel by viewModels()
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +32,7 @@ class OnboardingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sessionManager = (requireActivity().application as TabirbazApplication).sessionManager
         setupViewPager()
         setupObservers()
         setupClickListeners()
@@ -47,27 +51,36 @@ class OnboardingFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.isLastPage.observe(viewLifecycleOwner) { isLast ->
-            binding.btnNext.apply {
-                text = if (isLast) getString(R.string.finish) else getString(R.string.next)
-                setOnClickListener {
-                    if (isLast) {
-                        navigateToLogin()
-                    } else {
-                        binding.viewPager.currentItem = binding.viewPager.currentItem + 1
-                    }
+        viewModel.isLastPage.observe(viewLifecycleOwner) { isLastPage ->
+            binding.btnNext.text = if (isLastPage) getString(R.string.finish) else getString(R.string.next)
+            if (isLastPage && binding.btnNext.text == getString(R.string.finish)) {
+                binding.btnNext.setOnClickListener {
+                    navigateToLogin()
                 }
             }
         }
     }
-
+    
     private fun setupClickListeners() {
         binding.btnSkip.setOnClickListener {
             navigateToLogin()
         }
+        
+        binding.btnNext.setOnClickListener {
+            val currentPosition = binding.viewPager.currentItem
+            if (currentPosition < (binding.viewPager.adapter?.itemCount ?: 0) - 1) {
+                binding.viewPager.currentItem = currentPosition + 1
+            } else {
+                navigateToLogin()
+            }
+        }
     }
-
+    
     private fun navigateToLogin() {
+        // Onboarding tamamlandı olarak işaretle
+        sessionManager.setOnboardingCompleted(true)
+        
+        // Giriş ekranına yönlendir
         findNavController().navigate(R.id.action_onboarding_to_login)
     }
 

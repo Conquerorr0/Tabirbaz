@@ -17,11 +17,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.fatihaltuntas.tabirbaz.model.UserProfile
 import com.fatihaltuntas.tabirbaz.TabirbazApplication
+import com.fatihaltuntas.tabirbaz.util.SessionManager
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
     
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val sessionManager: SessionManager by lazy { 
+        (getApplication() as TabirbazApplication).sessionManager 
+    }
     
     private val _currentUser = MutableLiveData<FirebaseUser?>()
     val currentUser: LiveData<FirebaseUser?> = _currentUser
@@ -38,6 +42,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     init {
         try {
             _currentUser.value = auth.currentUser
+            // Kullanıcı varsa oturum bilgisini güncelle
+            auth.currentUser?.let {
+                sessionManager.setLoggedIn(true)
+            }
         } catch (e: Exception) {
             _error.value = e.message
         }
@@ -49,6 +57,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _loading.value = true
                 val result = auth.signInWithEmailAndPassword(email, password).await()
                 _currentUser.value = result.user
+                // Başarılı giriş durumunda oturum bilgisini güncelle
+                sessionManager.setLoggedIn(true)
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -64,7 +74,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 val credential = GoogleAuthProvider.getCredential(account.idToken, null)
                 val result = auth.signInWithCredential(credential).await()
                 _currentUser.value = result.user
-                result.user?.let { createUserProfile(it) }
+                result.user?.let { 
+                    createUserProfile(it)
+                    // Başarılı giriş durumunda oturum bilgisini güncelle
+                    sessionManager.setLoggedIn(true)
+                }
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -99,6 +113,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 result.user?.let { user ->
                     sendEmailVerification(user)
                     createUserProfile(user)
+                    // Kayıt durumunda oturum bilgisini güncelle
+                    sessionManager.setLoggedIn(true)
                 }
                 _currentUser.value = result.user
             } catch (e: Exception) {
@@ -176,6 +192,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun signOut() {
         auth.signOut()
         _currentUser.value = null
+        // Çıkış durumunda oturum bilgisini temizle
+        sessionManager.clearSession()
     }
 
     fun setError(message: String) {

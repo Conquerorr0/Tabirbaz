@@ -2,11 +2,15 @@ package com.fatihaltuntas.tabirbaz
 
 import android.app.Application
 import android.util.Log
+import com.fatihaltuntas.tabirbaz.util.SessionManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class TabirbazApplication : Application() {
+    
+    lateinit var sessionManager: SessionManager
+        private set
     
     companion object {
         private const val TAG = "TabirbazApplication"
@@ -17,6 +21,7 @@ class TabirbazApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        sessionManager = SessionManager(this)
         initializeFirebase()
     }
 
@@ -33,6 +38,11 @@ class TabirbazApplication : Application() {
             // Firebase servislerini başlat
             val auth = FirebaseAuth.getInstance()
             val db = FirebaseFirestore.getInstance()
+            
+            // Kullanıcı zaten giriş yapmışsa oturumu kaydet
+            auth.currentUser?.let {
+                sessionManager.setLoggedIn(true)
+            }
             
             Log.d(TAG, "Firebase services initialized successfully")
         } catch (e: Exception) {
