@@ -1,16 +1,19 @@
 package com.fatihaltuntas.tabirbaz.view.fragments.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentProfileCompletionBinding
 import com.fatihaltuntas.tabirbaz.model.UserProfile
+import com.fatihaltuntas.tabirbaz.view.activities.MainActivity
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
@@ -39,19 +42,24 @@ class ProfileCompletionFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
-            binding.loadingAnimation.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.loadingAnimation.isVisible = isLoading
             binding.btnComplete.isEnabled = !isLoading
+            binding.btnComplete.isVisible = !isLoading
+            binding.etName.isEnabled = !isLoading
+            binding.btnBirthDate.isEnabled = !isLoading
+            binding.rgGender.isEnabled = !isLoading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
             }
         }
 
         viewModel.profileUpdateSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
-                findNavController().navigate(R.id.action_profileCompletionFragment_to_mainActivity)
+                startMainActivity()
             }
         }
     }
@@ -108,6 +116,14 @@ class ProfileCompletionFragment : Fragment() {
             return false
         }
         return true
+    }
+
+    private fun startMainActivity() {
+        val intent = Intent(requireContext(), MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     override fun onDestroyView() {

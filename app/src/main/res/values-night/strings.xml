@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Tabirbaz</string>
     <string name="app_logo_desc">Uygulama Logosu</string>
+    <string name="onboarding">Hoş Geldiniz</string>
+    <string name="email_verification">E-posta Doğrulama</string>
 </resources>

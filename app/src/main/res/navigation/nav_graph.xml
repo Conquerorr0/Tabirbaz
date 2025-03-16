@@ -1,41 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/welcomeActivity">
+    app:startDestination="@id/welcomeFragment">
 
-    <activity
-        android:id="@+id/welcomeActivity"
-        android:name="com.fatihaltuntas.tabirbaz.view.activities.WelcomeActivity"
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.fatihaltuntas.tabirbaz.view.fragments.WelcomeFragment"
         android:label="@string/welcome"
-        tools:layout="@layout/activity_welcome">
+        tools:layout="@layout/fragment_welcome">
         
         <action
-            android:id="@+id/action_welcome_to_main"
-            app:destination="@id/mainActivity"
-            app:popUpTo="@id/welcomeActivity"
+            android:id="@+id/action_welcomeFragment_to_onboarding"
+            app:destination="@id/onboardingFragment"
+            app:popUpTo="@id/welcomeFragment"
             app:popUpToInclusive="true" />
             
         <action
-            android:id="@+id/action_welcome_to_onboarding"
-            app:destination="@id/onboardingFragment" />
-
-        <action
-            android:id="@+id/action_welcome_to_register"
-            app:destination="@id/registerFragment" />
-    </activity>
-
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="com.fatihaltuntas.tabirbaz.view.activities.MainActivity"
-        android:label="@string/app_name"
-        tools:layout="@layout/activity_main" />
+            android:id="@+id/action_welcomeFragment_to_register"
+            app:destination="@id/registerFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/onboardingFragment"
         android:name="com.fatihaltuntas.tabirbaz.view.fragments.OnboardingFragment"
-        android:label="@string/create_account"
+        android:label="@string/onboarding"
         tools:layout="@layout/fragment_onboarding">
         
         <action
@@ -62,12 +54,6 @@
             app:destination="@id/registerFragment" />
             
         <action
-            android:id="@+id/action_login_to_main"
-            app:destination="@id/mainActivity"
-            app:popUpTo="@id/welcomeActivity"
-            app:popUpToInclusive="true" />
-            
-        <action
             android:id="@+id/action_login_to_forgotPassword"
             app:destination="@id/forgotPasswordFragment" />
 
@@ -90,25 +76,27 @@
 
         <action
             android:id="@+id/action_register_to_emailVerification"
-            app:destination="@id/emailVerificationFragment" />
+            app:destination="@id/emailVerificationFragment"
+            app:popUpTo="@id/registerFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
         android:id="@+id/emailVerificationFragment"
         android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.EmailVerificationFragment"
-        android:label="EmailVerificationFragment">
+        android:label="@string/email_verification"
+        tools:layout="@layout/fragment_email_verification">
         <action
             android:id="@+id/action_emailVerification_to_profileCompletion"
-            app:destination="@id/profileCompletionFragment" />
+            app:destination="@id/profileCompletionFragment"
+            app:popUpTo="@id/emailVerificationFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
         android:id="@+id/profileCompletionFragment"
         android:name="com.fatihaltuntas.tabirbaz.view.fragments.auth.ProfileCompletionFragment"
-        android:label="ProfileCompletionFragment">
-        <action
-            android:id="@+id/action_profileCompletionFragment_to_mainActivity"
-            app:destination="@id/mainActivity" />
-    </fragment>
+        android:label="@string/complete_profile"
+        tools:layout="@layout/fragment_profile_completion" />
 
 </navigation>

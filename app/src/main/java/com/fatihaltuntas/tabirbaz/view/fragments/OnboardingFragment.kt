@@ -31,6 +31,7 @@ class OnboardingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
         setupObservers()
+        setupClickListeners()
     }
 
     private fun setupViewPager() {
@@ -51,13 +52,23 @@ class OnboardingFragment : Fragment() {
                 text = if (isLast) getString(R.string.finish) else getString(R.string.next)
                 setOnClickListener {
                     if (isLast) {
-                        findNavController().navigate(R.id.action_onboarding_to_login)
+                        navigateToLogin()
                     } else {
                         binding.viewPager.currentItem = binding.viewPager.currentItem + 1
                     }
                 }
             }
         }
+    }
+
+    private fun setupClickListeners() {
+        binding.btnSkip.setOnClickListener {
+            navigateToLogin()
+        }
+    }
+
+    private fun navigateToLogin() {
+        findNavController().navigate(R.id.action_onboarding_to_login)
     }
 
     override fun onDestroyView() {

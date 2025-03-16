@@ -3,7 +3,11 @@
     <string name="app_name">Tabirbaz</string>
 
     <!-- Config -->
-    <string name="web_client_id">YOUR_WEB_CLIENT_ID</string>
+    <string name="web_client_id">842598993433-h8abc6b44fd3soaekls28qjl0ptqmkjd.apps.googleusercontent.com</string>
+
+    <!-- Navigation Labels -->
+    <string name="onboarding">Hoş Geldiniz</string>
+    <string name="email_verification">E-posta Doğrulama</string>
 
     <!-- Welcome Screen -->
     <string name="welcome">Tabirbaz\'a Hoş Geldiniz</string>
@@ -110,4 +114,7 @@
     <string name="style_symbolic">Sembolik</string>
     <string name="style_spiritual">Spiritüel</string>
     <string name="app_logo_desc">Uygulama Logosu</string>
+
+    <!-- Error Messages -->
+    <string name="unknown_error">Bilinmeyen bir hata oluştu</string>
 </resources>

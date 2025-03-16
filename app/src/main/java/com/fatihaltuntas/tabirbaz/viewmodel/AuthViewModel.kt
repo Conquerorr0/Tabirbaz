@@ -16,10 +16,12 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.fatihaltuntas.tabirbaz.model.UserProfile
+import com.fatihaltuntas.tabirbaz.TabirbazApplication
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     
     private val _currentUser = MutableLiveData<FirebaseUser?>()
     val currentUser: LiveData<FirebaseUser?> = _currentUser
@@ -34,51 +36,59 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     val profileUpdateSuccess: LiveData<Boolean> = _profileUpdateSuccess
 
     init {
-        _currentUser.value = auth.currentUser
+        try {
+            _currentUser.value = auth.currentUser
+        } catch (e: Exception) {
+            _error.value = e.message
+        }
     }
 
     fun signInWithEmailAndPassword(email: String, password: String) {
-        _loading.value = true
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
+        viewModelScope.launch {
+            try {
+                _loading.value = true
+                val result = auth.signInWithEmailAndPassword(email, password).await()
+                _currentUser.value = result.user
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
                 _loading.value = false
-                if (task.isSuccessful) {
-                    _currentUser.value = auth.currentUser
-                } else {
-                    _error.value = task.exception?.message
-                }
             }
+        }
     }
 
     fun signInWithGoogle(account: GoogleSignInAccount) {
-        _loading.value = true
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
+        viewModelScope.launch {
+            try {
+                _loading.value = true
+                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                val result = auth.signInWithCredential(credential).await()
+                _currentUser.value = result.user
+                result.user?.let { createUserProfile(it) }
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
                 _loading.value = false
-                if (task.isSuccessful) {
-                    _currentUser.value = auth.currentUser
-                    createUserProfile(auth.currentUser!!)
-                } else {
-                    _error.value = task.exception?.message
-                }
             }
+        }
     }
 
-    private fun createUserProfile(user: FirebaseUser) {
-        val userProfile = hashMapOf(
-            "uid" to user.uid,
-            "email" to user.email,
-            "displayName" to user.displayName,
-            "photoUrl" to user.photoUrl?.toString(),
-            "createdAt" to FieldValue.serverTimestamp()
-        )
+    private suspend fun createUserProfile(user: FirebaseUser) {
+        try {
+            val userProfile = hashMapOf(
+                "uid" to user.uid,
+                "email" to user.email,
+                "displayName" to user.displayName,
+                "photoUrl" to user.photoUrl?.toString(),
+                "createdAt" to FieldValue.serverTimestamp()
+            )
 
-        db.collection("users").document(user.uid)
-            .set(userProfile, SetOptions.merge())
-            .addOnFailureListener { e ->
-                _error.value = e.message
-            }
+            db.collection("users").document(user.uid)
+                .set(userProfile, SetOptions.merge())
+                .await()
+        } catch (e: Exception) {
+            _error.value = e.message
+        }
     }
 
     fun signUp(email: String, password: String) {
@@ -99,13 +109,28 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun sendEmailVerification(user: FirebaseUser) {
+    suspend fun sendEmailVerification(user: FirebaseUser) {
+        try {
+            _loading.value = true
+            user.sendEmailVerification().await()
+        } catch (e: Exception) {
+            _error.value = e.message ?: "E-posta doğrulama gönderilirken bir hata oluştu"
+        } finally {
+            _loading.value = false
+        }
+    }
+
+    fun resendVerificationEmail() {
         viewModelScope.launch {
             try {
                 _loading.value = true
-                user.sendEmailVerification().await()
+                auth.currentUser?.let { user ->
+                    sendEmailVerification(user)
+                } ?: run {
+                    _error.value = "Kullanıcı oturumu bulunamadı"
+                }
             } catch (e: Exception) {
-                _error.value = e.message
+                _error.value = e.message ?: "E-posta doğrulama gönderilirken bir hata oluştu"
             } finally {
                 _loading.value = false
             }
@@ -124,10 +149,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                         .await()
                     _profileUpdateSuccess.value = true
                 } else {
-                    _error.value = "User not found"
+                    _error.value = "Kullanıcı bulunamadı"
                 }
             } catch (e: Exception) {
-                _error.value = e.message
+                _error.value = e.message ?: "Profil güncellenirken bir hata oluştu"
+                _profileUpdateSuccess.value = false
             } finally {
                 _loading.value = false
             }
@@ -135,14 +161,16 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun resetPassword(email: String) {
-        _loading.value = true
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
+        viewModelScope.launch {
+            try {
+                _loading.value = true
+                auth.sendPasswordResetEmail(email).await()
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
                 _loading.value = false
-                if (!task.isSuccessful) {
-                    _error.value = task.exception?.message
-                }
             }
+        }
     }
 
     fun signOut() {

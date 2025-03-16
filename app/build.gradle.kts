@@ -1,12 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.gms.google-services") version "4.4.2" apply false
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.fatihaltuntas.tabirbaz"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.fatihaltuntas.tabirbaz"
@@ -49,6 +49,7 @@ dependencies {
     
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     
@@ -61,6 +62,9 @@ dependencies {
     
     // Lottie
     implementation("com.airbnb.android:lottie:6.3.0")
+    
+    // Dots Indicator
+    implementation("com.tbuonomo:dotsindicator:5.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

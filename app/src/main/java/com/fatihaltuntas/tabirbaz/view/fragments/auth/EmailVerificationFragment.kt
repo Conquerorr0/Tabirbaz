@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentEmailVerificationBinding
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 class EmailVerificationFragment : Fragment() {
     private var _binding: FragmentEmailVerificationBinding? = null
@@ -43,7 +46,7 @@ class EmailVerificationFragment : Fragment() {
         }
 
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
-            binding.loadingAnimation.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.loadingAnimation.isVisible = isLoading
             binding.btnResendEmail.isEnabled = !isLoading
             binding.btnContinue.isEnabled = !isLoading
         }
@@ -51,16 +54,15 @@ class EmailVerificationFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
             }
         }
     }
 
     private fun setupClickListeners() {
         binding.btnResendEmail.setOnClickListener {
-            viewModel.currentUser.value?.let { user ->
-                viewModel.sendEmailVerification(user)
-                Toast.makeText(requireContext(), getString(R.string.email_verification_sent), Toast.LENGTH_LONG).show()
-            }
+            viewModel.resendVerificationEmail()
+            Toast.makeText(requireContext(), getString(R.string.email_verification_sent), Toast.LENGTH_LONG).show()
         }
 
         binding.btnContinue.setOnClickListener {
@@ -69,15 +71,18 @@ class EmailVerificationFragment : Fragment() {
     }
 
     private fun checkEmailVerification() {
-        viewModel.currentUser.value?.let { user ->
-            user.reload().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
+        lifecycleScope.launch {
+            try {
+                viewModel.currentUser.value?.let { user ->
+                    user.reload()
                     if (user.isEmailVerified) {
                         findNavController().navigate(R.id.action_emailVerification_to_profileCompletion)
                     } else {
                         Toast.makeText(requireContext(), getString(R.string.email_verification_required), Toast.LENGTH_LONG).show()
                     }
                 }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), e.message ?: getString(R.string.unknown_error), Toast.LENGTH_LONG).show()
             }
         }
     }
