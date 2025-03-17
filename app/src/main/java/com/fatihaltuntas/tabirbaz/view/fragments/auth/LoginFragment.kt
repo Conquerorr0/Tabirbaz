@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentLoginBinding
@@ -20,10 +20,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var viewModel: AuthViewModel
+    private val viewModel: AuthViewModel by viewModels { 
+        ViewModelFactory(requireActivity().application) 
+    }
     private lateinit var googleSignInClient: GoogleSignInClient
 
     private val googleSignInLauncher = registerForActivityResult(
@@ -51,7 +54,6 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))[AuthViewModel::class.java]
         
         setupGoogleSignIn()
         setupClickListeners()
@@ -71,6 +73,12 @@ class LoginFragment : Fragment() {
             btnLogin.setOnClickListener {
                 val email = etEmail.text.toString()
                 val password = etPassword.text.toString()
+                
+                if (email.isBlank() || password.isBlank()) {
+                    viewModel.setError(getString(R.string.fill_all_fields))
+                    return@setOnClickListener
+                }
+                
                 viewModel.signInWithEmailAndPassword(email, password)
             }
 
@@ -102,12 +110,13 @@ class LoginFragment : Fragment() {
 
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
             binding.loadingAnimation.isVisible = isLoading
+            binding.btnLogin.isEnabled = !isLoading
+            binding.btnGoogleSignIn.isEnabled = !isLoading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-                print(it)
                 viewModel.clearError()
             }
         }

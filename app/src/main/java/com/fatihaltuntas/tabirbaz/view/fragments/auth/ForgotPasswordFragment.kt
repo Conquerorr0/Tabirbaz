@@ -8,14 +8,18 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.core.view.isVisible
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentForgotPasswordBinding
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class ForgotPasswordFragment : Fragment() {
     private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: AuthViewModel by viewModels()
+    private val viewModel: AuthViewModel by viewModels {
+        ViewModelFactory(requireActivity().application)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,9 +37,15 @@ class ForgotPasswordFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            binding.loadingAnimation.isVisible = isLoading
+            binding.btnResetPassword.isEnabled = !isLoading
+        }
+
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.clearError()
             }
         }
     }
@@ -43,16 +53,16 @@ class ForgotPasswordFragment : Fragment() {
     private fun setupClickListeners() {
         binding.btnResetPassword.setOnClickListener {
             val email = binding.etEmail.text.toString()
-            if (email.isNotEmpty()) {
-                viewModel.resetPassword(email)
-                Toast.makeText(requireContext(), getString(R.string.reset_password_sent), Toast.LENGTH_LONG).show()
-                findNavController().navigateUp()
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.enter_email), Toast.LENGTH_SHORT).show()
+            if (email.isBlank()) {
+                viewModel.setError(getString(R.string.enter_email))
+                return@setOnClickListener
             }
+            viewModel.resetPassword(email)
+            Toast.makeText(requireContext(), getString(R.string.reset_password_sent), Toast.LENGTH_LONG).show()
+            findNavController().navigateUp()
         }
 
-        binding.btnBack.setOnClickListener {
+        binding.ivBack.setOnClickListener {
             findNavController().navigateUp()
         }
     }

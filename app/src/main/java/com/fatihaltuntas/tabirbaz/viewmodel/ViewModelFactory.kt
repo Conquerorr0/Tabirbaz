@@ -1,12 +1,13 @@
 package com.fatihaltuntas.tabirbaz.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fatihaltuntas.tabirbaz.repository.DreamRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ViewModelFactory : ViewModelProvider.Factory {
+class ViewModelFactory(private val application: Application? = null) : ViewModelProvider.Factory {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -27,6 +28,11 @@ class ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
                 HomeViewModel(dreamRepository) as T
+            }
+            modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
+                application?.let {
+                    AuthViewModel(it) as T
+                } ?: throw IllegalArgumentException("AuthViewModel için Application parametresi gereklidir")
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }

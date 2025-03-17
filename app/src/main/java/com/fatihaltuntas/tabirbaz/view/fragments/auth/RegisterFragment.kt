@@ -5,46 +5,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentRegisterBinding
 import com.fatihaltuntas.tabirbaz.viewmodel.AuthViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class RegisterFragment : Fragment() {
-    private var _binding: FragmentRegisterBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: AuthViewModel by viewModels()
+    private lateinit var binding: FragmentRegisterBinding
+    private val viewModel: AuthViewModel by viewModels {
+        ViewModelFactory(requireActivity().application)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupObservers()
+        
         setupClickListeners()
-    }
-
-    private fun setupObservers() {
-        viewModel.currentUser.observe(viewLifecycleOwner) { user ->
-            user?.let {
-                // Kayıt başarılı, login ekranına yönlendir
-                findNavController().navigate(R.id.action_register_to_login)
-            }
-        }
-
-        viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-            }
-        }
+        setupObservers()
     }
 
     private fun setupClickListeners() {
@@ -52,27 +41,49 @@ class RegisterFragment : Fragment() {
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
             val confirmPassword = binding.etConfirmPassword.text.toString()
-
-            when {
-                email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
-                    Toast.makeText(requireContext(), getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
-                }
-                password != confirmPassword -> {
-                    Toast.makeText(requireContext(), getString(R.string.passwords_not_match), Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    viewModel.signUp(email, password)
-                }
+            
+            // Validate inputs
+            if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                viewModel.setError(getString(R.string.fill_all_fields))
+                return@setOnClickListener
             }
+            
+            if (password != confirmPassword) {
+                viewModel.setError(getString(R.string.passwords_not_match))
+                return@setOnClickListener
+            }
+            
+            // Register user
+            viewModel.signUp(email, password)
         }
 
         binding.tvLogin.setOnClickListener {
             findNavController().navigate(R.id.action_register_to_login)
         }
+        
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setupObservers() {
+        viewModel.currentUser.observe(viewLifecycleOwner) { user ->
+            user?.let {
+                // Redirect to email verification
+                findNavController().navigate(R.id.action_register_to_emailVerification)
+            }
+        }
+
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            binding.loadingAnimation.isVisible = isLoading
+            binding.btnRegister.isEnabled = !isLoading
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
+            }
+        }
     }
 }
