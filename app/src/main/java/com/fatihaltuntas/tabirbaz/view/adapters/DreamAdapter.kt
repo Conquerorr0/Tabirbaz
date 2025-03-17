@@ -39,7 +39,7 @@ class DreamAdapter(private val onDreamClick: (Dream) -> Unit) :
             } else {
                 dream.content
             }
-            binding.tvDreamContent.text = contentPreview
+            binding.tvDreamExcerpt.text = contentPreview
             
             binding.root.setOnClickListener {
                 onDreamClick(dream)

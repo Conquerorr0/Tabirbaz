@@ -14,13 +14,14 @@ import com.fatihaltuntas.tabirbaz.databinding.FragmentHomeBinding
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamCategoryAdapter
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
 import com.fatihaltuntas.tabirbaz.viewmodel.HomeViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels { ViewModelFactory() }
     private lateinit var categoryAdapter: DreamCategoryAdapter
     private lateinit var recentDreamsAdapter: DreamAdapter
     private lateinit var popularDreamsAdapter: DreamAdapter
@@ -52,11 +53,11 @@ class HomeFragment : Fragment() {
         // Kategori adaptörü
         categoryAdapter = DreamCategoryAdapter { category ->
             // Kategori tıklandığında kategori detay sayfasına git
-            val action = HomeFragmentDirections.actionHomeFragmentToCategoryDreamsFragment(
-                categoryId = category.id,
-                categoryName = category.name
-            )
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("categoryId", category.id)
+                putString("categoryName", category.name)
+            }
+            findNavController().navigate(R.id.categoryDreamsFragment, bundle)
         }
         binding.rvCategories.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -66,8 +67,10 @@ class HomeFragment : Fragment() {
         // Son rüyalar adaptörü
         recentDreamsAdapter = DreamAdapter { dream ->
             // Rüya tıklandığında rüya detay sayfasına git
-            val action = HomeFragmentDirections.actionHomeFragmentToDreamDetailFragment(dreamId = dream.id)
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("dreamId", dream.id)
+            }
+            findNavController().navigate(R.id.dreamDetailFragment, bundle)
         }
         binding.rvRecentDreams.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -77,8 +80,10 @@ class HomeFragment : Fragment() {
         // Popüler rüyalar adaptörü
         popularDreamsAdapter = DreamAdapter { dream ->
             // Rüya tıklandığında rüya detay sayfasına git
-            val action = HomeFragmentDirections.actionHomeFragmentToDreamDetailFragment(dreamId = dream.id)
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("dreamId", dream.id)
+            }
+            findNavController().navigate(R.id.dreamDetailFragment, bundle)
         }
         binding.rvPopularDreams.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -98,8 +103,10 @@ class HomeFragment : Fragment() {
                 binding.tvDailyDreamTitle.text = it.title
                 binding.tvDailyDreamInterpretation.text = it.interpretation
                 binding.cardDailyDream.setOnClickListener { _ ->
-                    val action = HomeFragmentDirections.actionHomeFragmentToDreamDetailFragment(dreamId = it.id)
-                    findNavController().navigate(action)
+                    val bundle = Bundle().apply {
+                        putString("dreamId", it.id)
+                    }
+                    findNavController().navigate(R.id.dreamDetailFragment, bundle)
                 }
             }
         }

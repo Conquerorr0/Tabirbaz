@@ -1,9 +1,8 @@
 package com.fatihaltuntas.tabirbaz.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fatihaltuntas.tabirbaz.model.Dream
 import com.fatihaltuntas.tabirbaz.model.DreamCategory
@@ -11,9 +10,8 @@ import com.fatihaltuntas.tabirbaz.repository.CategoryRepository
 import com.fatihaltuntas.tabirbaz.repository.DreamRepository
 import kotlinx.coroutines.launch
 
-class ExploreViewModel(application: Application) : AndroidViewModel(application) {
+class ExploreViewModel(private val dreamRepository: DreamRepository) : ViewModel() {
     
-    private val dreamRepository = DreamRepository()
     private val categoryRepository = CategoryRepository()
     
     private val _loading = MutableLiveData<Boolean>()

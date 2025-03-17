@@ -121,8 +121,11 @@ class AddDreamFragment : Fragment() {
                     
                     // Rüya detay sayfasına yönlendir
                     resource.data?.id?.let { dreamId ->
-                        val action = AddDreamFragmentDirections.actionAddDreamFragmentToDreamResultFragment(dreamId)
-                        findNavController().navigate(action)
+                        val action = findNavController().navigate(R.id.action_addDreamFragment_to_dreamResultFragment, 
+                            Bundle().apply {
+                                putString("dreamId", dreamId)
+                            }
+                        )
                     }
                     
                     // ViewModel'deki durumu sıfırla

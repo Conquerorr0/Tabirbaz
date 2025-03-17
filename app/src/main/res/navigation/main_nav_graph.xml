@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_exploreFragment_to_searchResultsFragment"
             app:destination="@id/searchResultsFragment" />
+        <action
+            android:id="@+id/action_exploreFragment_to_categoryDreamsFragment"
+            app:destination="@id/categoryDreamsFragment" />
     </fragment>
 
     <fragment
@@ -72,6 +75,9 @@
         <argument
             android:name="dreamId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_dreamDetailFragment_self"
+            app:destination="@id/dreamDetailFragment" />
     </fragment>
 
     <fragment

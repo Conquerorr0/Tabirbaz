@@ -10,17 +10,19 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentExploreBinding
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
 import com.fatihaltuntas.tabirbaz.view.adapters.ExploreCategoryAdapter
 import com.fatihaltuntas.tabirbaz.viewmodel.ExploreViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class ExploreFragment : Fragment() {
 
     private var _binding: FragmentExploreBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: ExploreViewModel by viewModels()
+    private val viewModel: ExploreViewModel by viewModels { ViewModelFactory() }
     private lateinit var categoryAdapter: ExploreCategoryAdapter
     private lateinit var popularDreamsAdapter: DreamAdapter
 
@@ -48,11 +50,11 @@ class ExploreFragment : Fragment() {
         // Kategori adaptörü
         categoryAdapter = ExploreCategoryAdapter { category ->
             // Kategori tıklandığında kategori detay sayfasına git
-            val action = ExploreFragmentDirections.actionExploreFragmentToCategoryDreamsFragment(
-                categoryId = category.id,
-                categoryName = category.name
-            )
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("categoryId", category.id)
+                putString("categoryName", category.name)
+            }
+            findNavController().navigate(R.id.categoryDreamsFragment, bundle)
         }
         
         binding.rvCategories.apply {
@@ -63,8 +65,10 @@ class ExploreFragment : Fragment() {
         // Popüler rüyalar adaptörü
         popularDreamsAdapter = DreamAdapter { dream ->
             // Rüya tıklandığında rüya detay sayfasına git
-            val action = ExploreFragmentDirections.actionExploreFragmentToDreamDetailFragment(dreamId = dream.id)
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("dreamId", dream.id)
+            }
+            findNavController().navigate(R.id.dreamDetailFragment, bundle)
         }
         
         binding.rvPopularDreams.apply {
@@ -76,8 +80,10 @@ class ExploreFragment : Fragment() {
     private fun setupClickListeners() {
         // Arama kutusuna tıklandığında arama sayfasına git
         binding.cardSearch.setOnClickListener {
-            val action = ExploreFragmentDirections.actionExploreFragmentToSearchResultsFragment(query = "")
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("query", "")
+            }
+            findNavController().navigate(R.id.searchResultsFragment, bundle)
         }
     }
     

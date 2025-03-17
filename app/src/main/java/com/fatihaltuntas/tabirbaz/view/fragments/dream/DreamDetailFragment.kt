@@ -9,20 +9,20 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentDreamDetailBinding
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
 import com.fatihaltuntas.tabirbaz.viewmodel.DreamDetailViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class DreamDetailFragment : Fragment() {
 
     private var _binding: FragmentDreamDetailBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: DreamDetailViewModel by viewModels()
-    private val args: DreamDetailFragmentArgs by navArgs()
+    private val viewModel: DreamDetailViewModel by viewModels { ViewModelFactory() }
+    private var dreamId: String? = null
     
     private lateinit var similarDreamsAdapter: DreamAdapter
 
@@ -37,12 +37,20 @@ class DreamDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // Argümanları al
+        dreamId = arguments?.getString("dreamId")
+        
         setupToolbar()
         setupAdapter()
         setupClickListeners()
         
         // Rüya detayını yükle
-        viewModel.loadDreamDetails(args.dreamId)
+        dreamId?.let { 
+            viewModel.loadDreamDetails(it)
+        } ?: run {
+            Toast.makeText(requireContext(), "Rüya ID'si bulunamadı", Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
+        }
         
         // ViewModel'daki verileri izle
         setupObservers()
@@ -57,8 +65,10 @@ class DreamDetailFragment : Fragment() {
     private fun setupAdapter() {
         similarDreamsAdapter = DreamAdapter { dream ->
             // Benzer rüyaya tıklandığında o rüyanın detayına git
-            val action = DreamDetailFragmentDirections.actionDreamDetailFragmentSelf(dreamId = dream.id)
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("dreamId", dream.id)
+            }
+            findNavController().navigate(R.id.dreamDetailFragment, bundle)
         }
         
         binding.rvSimilarDreams.apply {
