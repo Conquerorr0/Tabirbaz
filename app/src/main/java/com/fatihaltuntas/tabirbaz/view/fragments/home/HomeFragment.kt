@@ -21,7 +21,9 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: HomeViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: HomeViewModel by viewModels { 
+        ViewModelFactory(requireActivity().application) 
+    }
     private lateinit var categoryAdapter: DreamCategoryAdapter
     private lateinit var recentDreamsAdapter: DreamAdapter
     private lateinit var popularDreamsAdapter: DreamAdapter

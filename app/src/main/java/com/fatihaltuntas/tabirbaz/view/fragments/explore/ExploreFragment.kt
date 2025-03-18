@@ -22,7 +22,9 @@ class ExploreFragment : Fragment() {
     private var _binding: FragmentExploreBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: ExploreViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: ExploreViewModel by viewModels { 
+        ViewModelFactory(requireActivity().application) 
+    }
     private lateinit var categoryAdapter: ExploreCategoryAdapter
     private lateinit var popularDreamsAdapter: DreamAdapter
 

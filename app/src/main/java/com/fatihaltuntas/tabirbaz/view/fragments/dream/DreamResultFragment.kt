@@ -36,7 +36,7 @@ class DreamResultFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         // ViewModel'i başlat
-        viewModel = ViewModelProvider(this, ViewModelFactory())[DreamViewModel::class.java]
+        viewModel = ViewModelProvider(this, ViewModelFactory(requireActivity().application))[DreamViewModel::class.java]
         
         setupToolbar()
         setupShareButton()

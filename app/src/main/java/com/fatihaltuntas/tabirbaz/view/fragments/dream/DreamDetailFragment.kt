@@ -21,7 +21,9 @@ class DreamDetailFragment : Fragment() {
     private var _binding: FragmentDreamDetailBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: DreamDetailViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: DreamDetailViewModel by viewModels { 
+        ViewModelFactory(requireActivity().application) 
+    }
     private var dreamId: String? = null
     
     private lateinit var similarDreamsAdapter: DreamAdapter
