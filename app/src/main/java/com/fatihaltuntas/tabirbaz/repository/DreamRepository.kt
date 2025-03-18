@@ -238,4 +238,73 @@ class DreamRepository(
             throw e
         }
     }
+    
+    /**
+     * Rüyanın görüntülenme sayısını artırır
+     */
+    suspend fun incrementViewCount(dreamId: String): Dream = withContext(Dispatchers.IO) {
+        try {
+            val dream = getDreamById(dreamId)
+            
+            // Görüntülenme sayısını arttır
+            val updatedDream = dream.copy(
+                viewCount = dream.viewCount + 1,
+                updatedAt = Timestamp.now()
+            )
+            
+            // Firestore'da güncelle
+            firestore.collection(DREAMS_COLLECTION)
+                .document(dreamId)
+                .set(updatedDream)
+                .await()
+                
+            Log.d(TAG, "Rüya görüntülenme sayısı artırıldı: $dreamId, Yeni sayı: ${updatedDream.viewCount}")
+            return@withContext updatedDream
+        } catch (e: Exception) {
+            Log.e(TAG, "Görüntülenme sayısı artırılırken hata oluştu", e)
+            throw e
+        }
+    }
+    
+    /**
+     * Popüler rüyaları getirir (görüntülenme sayısına göre)
+     */
+    suspend fun getPopularDreams(limit: Int = 10): List<Dream> = withContext(Dispatchers.IO) {
+        try {
+            val popularDreamDocs = firestore.collection(DREAMS_COLLECTION)
+                .orderBy("viewCount", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get()
+                .await()
+                
+            val popularDreams = popularDreamDocs.toObjects(Dream::class.java)
+            
+            Log.d(TAG, "Popüler rüyalar getirildi. Toplam: ${popularDreams.size}")
+            return@withContext popularDreams
+        } catch (e: Exception) {
+            Log.e(TAG, "Popüler rüyalar getirilirken hata oluştu", e)
+            throw e
+        }
+    }
+    
+    /**
+     * Öne çıkarılan rüyaları getirir
+     */
+    suspend fun getFeaturedDreams(limit: Int = 1): List<Dream> = withContext(Dispatchers.IO) {
+        try {
+            val featuredDreamDocs = firestore.collection(DREAMS_COLLECTION)
+                .whereEqualTo("featured", true)
+                .limit(limit.toLong())
+                .get()
+                .await()
+                
+            val featuredDreams = featuredDreamDocs.toObjects(Dream::class.java)
+            
+            Log.d(TAG, "Öne çıkarılan rüyalar getirildi. Toplam: ${featuredDreams.size}")
+            return@withContext featuredDreams
+        } catch (e: Exception) {
+            Log.e(TAG, "Öne çıkarılan rüyalar getirilirken hata oluştu", e)
+            throw e
+        }
+    }
 } 

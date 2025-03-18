@@ -9,6 +9,8 @@ import com.fatihaltuntas.tabirbaz.model.DreamCategory
 import com.fatihaltuntas.tabirbaz.repository.DreamRepository
 import com.fatihaltuntas.tabirbaz.repository.CategoryRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import com.fatihaltuntas.tabirbaz.util.Resource
 
 class HomeViewModel(private val dreamRepository: DreamRepository) : ViewModel() {
     
@@ -23,14 +25,20 @@ class HomeViewModel(private val dreamRepository: DreamRepository) : ViewModel() 
     private val _categories = MutableLiveData<List<DreamCategory>>()
     val categories: LiveData<List<DreamCategory>> = _categories
     
-    private val _featuredDream = MutableLiveData<Dream?>()
-    val featuredDream: LiveData<Dream?> = _featuredDream
+    private val _featuredDream = MutableLiveData<Resource<Dream>>()
+    val featuredDream: LiveData<Resource<Dream>> = _featuredDream
     
-    private val _recentDreams = MutableLiveData<List<Dream>>()
-    val recentDreams: LiveData<List<Dream>> = _recentDreams
+    private val _recentDreams = MutableLiveData<Resource<List<Dream>>>()
+    val recentDreams: LiveData<Resource<List<Dream>>> = _recentDreams
     
     private val _popularDreams = MutableLiveData<List<Dream>>()
     val popularDreams: LiveData<List<Dream>> = _popularDreams
+    
+    init {
+        loadCategories()
+        loadFeaturedDream()
+        loadRecentDreams()
+    }
     
     // Ana sayfa verilerini yükle
     fun loadHomeData() {
@@ -41,12 +49,12 @@ class HomeViewModel(private val dreamRepository: DreamRepository) : ViewModel() 
     }
     
     // Kategorileri yükle
-    fun loadCategories() {
+    private fun loadCategories() {
         viewModelScope.launch {
             try {
                 _loading.value = true
-                val categoriesList = categoryRepository.getAllCategories()
-                _categories.value = categoriesList
+                val categoryList = dreamRepository.getCategoriesWithIds()
+                _categories.value = categoryList
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -56,37 +64,46 @@ class HomeViewModel(private val dreamRepository: DreamRepository) : ViewModel() 
     }
     
     // Günün rüya yorumunu yükle
-    fun loadFeaturedDream() {
-        viewModelScope.launch {
+    private fun loadFeaturedDream() {
+        _featuredDream.value = Resource.Loading()
+        
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                _loading.value = true
-                val dream = dreamRepository.getFeaturedDream()
-                _featuredDream.value = dream
+                val featuredDreams = dreamRepository.getFeaturedDreams()
+                if (featuredDreams.isNotEmpty()) {
+                    _featuredDream.postValue(Resource.Success(featuredDreams.first()))
+                } else {
+                    _featuredDream.postValue(Resource.Error("Öne çıkan rüya bulunamadı"))
+                }
             } catch (e: Exception) {
-                _error.value = e.message
-            } finally {
-                _loading.value = false
+                _featuredDream.postValue(Resource.Error(e.message ?: "Bilinmeyen bir hata oluştu"))
             }
         }
     }
     
     // Kullanıcının son rüyalarını yükle
-    fun loadRecentDreams() {
-        viewModelScope.launch {
+    private fun loadRecentDreams() {
+        _recentDreams.value = Resource.Loading()
+        
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                _loading.value = true
-                val dreams = dreamRepository.getUserDreams(limit = 5)
-                _recentDreams.value = dreams
+                val userId = dreamRepository.getCurrentUserId()
+                if (userId != null) {
+                    val userDreams = dreamRepository.getUserDreams(userId)
+                    // Son 5 rüyayı al
+                    val recentUserDreams = userDreams.sortedByDescending { it.createdAt }.take(5)
+                    _recentDreams.postValue(Resource.Success(recentUserDreams))
+                } else {
+                    _recentDreams.postValue(Resource.Error("Kullanıcı giriş yapmamış"))
+                }
             } catch (e: Exception) {
-                _error.value = e.message
-            } finally {
-                _loading.value = false
+                _recentDreams.postValue(Resource.Error(e.message ?: "Bilinmeyen bir hata oluştu"))
             }
         }
     }
     
     // Popüler rüyaları yükle
-    fun loadPopularDreams() {
+    private fun loadPopularDreams() {
         viewModelScope.launch {
             try {
                 _loading.value = true

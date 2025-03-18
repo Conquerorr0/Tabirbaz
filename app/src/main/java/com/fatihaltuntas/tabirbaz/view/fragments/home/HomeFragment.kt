@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,6 +16,7 @@ import com.fatihaltuntas.tabirbaz.view.adapters.DreamCategoryAdapter
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
 import com.fatihaltuntas.tabirbaz.viewmodel.HomeViewModel
 import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
+import com.fatihaltuntas.tabirbaz.util.Resource
 
 class HomeFragment : Fragment() {
 
@@ -27,6 +29,7 @@ class HomeFragment : Fragment() {
     private lateinit var categoryAdapter: DreamCategoryAdapter
     private lateinit var recentDreamsAdapter: DreamAdapter
     private lateinit var popularDreamsAdapter: DreamAdapter
+    private lateinit var loadingIndicator: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,17 @@ class HomeFragment : Fragment() {
         
         // Ana sayfa verilerini yükle
         viewModel.loadHomeData()
+
+        // ProgressBar'ı başlat
+        loadingIndicator = ProgressBar(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            visibility = View.GONE
+        }
+
+        (binding.root as ViewGroup).addView(loadingIndicator)
     }
     
     private fun setupAdapters() {
@@ -100,24 +114,59 @@ class HomeFragment : Fragment() {
         }
         
         // Günün rüyasını izle
-        viewModel.featuredDream.observe(viewLifecycleOwner) { dream ->
-            dream?.let {
-                binding.tvDailyDreamTitle.text = it.title
-                binding.tvDailyDreamInterpretation.text = it.interpretation
-                binding.cardDailyDream.setOnClickListener { _ ->
-                    val bundle = Bundle().apply {
-                        putString("dreamId", it.id)
+        viewModel.featuredDream.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    binding.cardDailyDream.visibility = View.VISIBLE
+                    loadingIndicator.visibility = View.GONE
+                    
+                    resource.data?.let { dream ->
+                        binding.tvDailyDreamTitle.text = dream.title
+                        binding.tvDailyDreamInterpretation.text = dream.interpretation
+                        
+                        binding.cardDailyDream.setOnClickListener {
+                            val bundle = Bundle().apply {
+                                putString("dreamId", dream.id)
+                            }
+                            findNavController().navigate(R.id.dreamDetailFragment, bundle)
+                        }
                     }
-                    findNavController().navigate(R.id.dreamDetailFragment, bundle)
                 }
+                is Resource.Error -> {
+                    binding.cardDailyDream.visibility = View.GONE
+                    loadingIndicator.visibility = View.GONE
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    binding.cardDailyDream.visibility = View.GONE
+                    loadingIndicator.visibility = View.VISIBLE
+                }
+                else -> {}
             }
         }
         
         // Son rüyaları izle
-        viewModel.recentDreams.observe(viewLifecycleOwner) { dreams ->
-            recentDreamsAdapter.submitList(dreams)
-            // XML'de emptyViewRecentDreams olmadığı için şimdilik kaldırıldı
-            // Boş durum görünümü eklendiğinde bu kısım güncellenecek
+        viewModel.recentDreams.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    loadingIndicator.visibility = View.GONE
+                    
+                    resource.data?.let { dreams ->
+                        recentDreamsAdapter.submitList(dreams)
+                        binding.rvRecentDreams.visibility = if (dreams.isEmpty()) View.GONE else View.VISIBLE
+                    }
+                }
+                is Resource.Error -> {
+                    loadingIndicator.visibility = View.GONE
+                    binding.rvRecentDreams.visibility = View.GONE
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    loadingIndicator.visibility = View.VISIBLE
+                    binding.rvRecentDreams.visibility = View.GONE
+                }
+                else -> {}
+            }
         }
         
         // Popüler rüyaları izle
