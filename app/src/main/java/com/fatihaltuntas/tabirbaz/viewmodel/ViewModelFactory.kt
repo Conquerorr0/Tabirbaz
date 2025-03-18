@@ -41,6 +41,9 @@ class ViewModelFactory(private val application: Application) : ViewModelProvider
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
                 ProfileViewModel(userRepository, dreamRepository, sessionManager) as T
             }
+            modelClass.isAssignableFrom(DreamViewModel::class.java) -> {
+                DreamViewModel(dreamRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
