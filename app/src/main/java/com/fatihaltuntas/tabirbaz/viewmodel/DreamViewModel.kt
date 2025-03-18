@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fatihaltuntas.tabirbaz.model.Dream
+import com.fatihaltuntas.tabirbaz.model.DreamCategory
 import com.fatihaltuntas.tabirbaz.repository.DreamRepository
 import com.fatihaltuntas.tabirbaz.util.Resource
 import com.google.firebase.Timestamp
@@ -19,18 +20,28 @@ class DreamViewModel(private val repository: DreamRepository) : ViewModel() {
 
     private val _categories = MutableLiveData<Resource<List<String>>>()
     val categories: LiveData<Resource<List<String>>> = _categories
+    
+    private val _categoriesWithIds = MutableLiveData<Resource<List<DreamCategory>>>()
+    val categoriesWithIds: LiveData<Resource<List<DreamCategory>>> = _categoriesWithIds
 
     private val _selectedDate = MutableLiveData<Date>()
     val selectedDate: LiveData<Date> = _selectedDate
 
     private val _selectedCategory = MutableLiveData<String>()
     val selectedCategory: LiveData<String> = _selectedCategory
+    
+    private val _selectedCategoryId = MutableLiveData<String>()
+    val selectedCategoryId: LiveData<String> = _selectedCategoryId
 
     private val _dreamDetails = MutableLiveData<Resource<Dream>>()
     val dreamDetails: LiveData<Resource<Dream>> = _dreamDetails
+    
+    private val _interpretationStatus = MutableLiveData<Resource<Dream>>()
+    val interpretationStatus: LiveData<Resource<Dream>> = _interpretationStatus
 
     init {
         loadCategories()
+        loadCategoriesWithIds()
     }
 
     fun addDream(title: String, content: String) {
@@ -43,7 +54,7 @@ class DreamViewModel(private val repository: DreamRepository) : ViewModel() {
                     userId = repository.getCurrentUserId() ?: "",
                     title = title,
                     content = content,
-                    categoryId = _selectedCategory.value ?: "",
+                    categoryId = _selectedCategoryId.value ?: "",
                     categoryName = _selectedCategory.value ?: "",
                     createdAt = Timestamp.now(),
                     updatedAt = Timestamp.now()
@@ -69,6 +80,20 @@ class DreamViewModel(private val repository: DreamRepository) : ViewModel() {
             }
         }
     }
+    
+    fun interpretDream(dreamId: String, content: String) {
+        _interpretationStatus.value = Resource.Loading()
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val interpretedDream = repository.interpretDream(dreamId, content)
+                _interpretationStatus.postValue(Resource.Success(interpretedDream))
+                _dreamDetails.postValue(Resource.Success(interpretedDream))
+            } catch (e: Exception) {
+                _interpretationStatus.postValue(Resource.Error(e.message ?: "Rüya yorumlanırken bir hata oluştu"))
+            }
+        }
+    }
 
     private fun loadCategories() {
         _categories.value = Resource.Loading()
@@ -82,6 +107,19 @@ class DreamViewModel(private val repository: DreamRepository) : ViewModel() {
             }
         }
     }
+    
+    private fun loadCategoriesWithIds() {
+        _categoriesWithIds.value = Resource.Loading()
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val categoryList = repository.getCategoriesWithIds()
+                _categoriesWithIds.postValue(Resource.Success(categoryList))
+            } catch (e: Exception) {
+                _categoriesWithIds.postValue(Resource.Error(e.message ?: "Kategoriler yüklenirken bir hata oluştu"))
+            }
+        }
+    }
 
     fun setSelectedDate(date: Date) {
         _selectedDate.value = date
@@ -90,8 +128,17 @@ class DreamViewModel(private val repository: DreamRepository) : ViewModel() {
     fun setSelectedCategory(category: String) {
         _selectedCategory.value = category
     }
+    
+    fun setSelectedCategoryWithId(categoryId: String, categoryName: String) {
+        _selectedCategoryId.value = categoryId
+        _selectedCategory.value = categoryName
+    }
 
     fun resetAddDreamStatus() {
         _addDreamStatus.value = Resource.Idle()
+    }
+    
+    fun resetInterpretationStatus() {
+        _interpretationStatus.value = Resource.Idle()
     }
 } 

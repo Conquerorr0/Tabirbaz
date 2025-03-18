@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentAddDreamBinding
+import com.fatihaltuntas.tabirbaz.model.DreamCategory
 import com.fatihaltuntas.tabirbaz.util.Resource
 import com.fatihaltuntas.tabirbaz.viewmodel.DreamViewModel
 import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
@@ -28,6 +29,7 @@ class AddDreamFragment : Fragment() {
     private lateinit var viewModel: DreamViewModel
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("tr"))
+    private var categoryList: List<DreamCategory> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,11 +92,12 @@ class AddDreamFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // Kategorileri gözlemle
-        viewModel.categories.observe(viewLifecycleOwner) { resource ->
+        // Kategorileri ID ve isim çiftleri ile gözlemle
+        viewModel.categoriesWithIds.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     resource.data?.let { categories ->
+                        categoryList = categories
                         setupCategoryChips(categories)
                     }
                 }
@@ -106,7 +109,8 @@ class AddDreamFragment : Fragment() {
                     ).show()
                 }
                 is Resource.Loading -> {
-                    // Yükleniyor durumunu gösterebiliriz
+                    binding.chipGroupCategories.visibility = View.INVISIBLE
+                    binding.categoriesLoading.visibility = View.VISIBLE
                 }
                 else -> {}
             }
@@ -121,7 +125,8 @@ class AddDreamFragment : Fragment() {
                     
                     // Rüya detay sayfasına yönlendir
                     resource.data?.id?.let { dreamId ->
-                        val action = findNavController().navigate(R.id.action_addDreamFragment_to_dreamResultFragment, 
+                        findNavController().navigate(
+                            R.id.action_addDreamFragment_to_dreamResultFragment, 
                             Bundle().apply {
                                 putString("dreamId", dreamId)
                             }
@@ -149,7 +154,9 @@ class AddDreamFragment : Fragment() {
         }
     }
 
-    private fun setupCategoryChips(categories: List<String>) {
+    private fun setupCategoryChips(categories: List<DreamCategory>) {
+        binding.chipGroupCategories.visibility = View.VISIBLE
+        binding.categoriesLoading.visibility = View.GONE
         binding.chipGroupCategories.removeAllViews()
         
         categories.forEach { category ->
@@ -159,12 +166,13 @@ class AddDreamFragment : Fragment() {
                 false
             ) as Chip
             
-            chip.text = category
+            chip.text = category.name
             chip.isCheckable = true
+            chip.tag = category.id
             
-            chip.setOnCheckedChangeListener { buttonView, isChecked ->
+            chip.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    viewModel.setSelectedCategory(category)
+                    viewModel.setSelectedCategoryWithId(category.id, category.name)
                 }
             }
             
@@ -173,7 +181,10 @@ class AddDreamFragment : Fragment() {
         
         // İlk kategoriyi varsayılan olarak seç
         if (categories.isNotEmpty()) {
-            (binding.chipGroupCategories.getChildAt(0) as? Chip)?.isChecked = true
+            val firstChip = binding.chipGroupCategories.getChildAt(0) as? Chip
+            firstChip?.isChecked = true
+            val firstCategory = categories.first()
+            viewModel.setSelectedCategoryWithId(firstCategory.id, firstCategory.name)
         }
     }
 

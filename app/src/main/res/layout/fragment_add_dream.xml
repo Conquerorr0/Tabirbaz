@@ -99,23 +99,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tilDreamContent" />
 
-            <HorizontalScrollView
-                android:id="@+id/categoryScrollView"
+            <FrameLayout
+                android:id="@+id/categoryFrameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:scrollbars="none"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvCategoryLabel">
+
+                <ProgressBar
+                    android:id="@+id/categoriesLoading"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroupCategories"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:singleSelection="true" />
 
-            </HorizontalScrollView>
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvDateLabel"
@@ -127,7 +133,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/categoryScrollView" />
+                app:layout_constraintTop_toBottomOf="@+id/categoryFrameLayout" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDreamDate"

@@ -1,6 +1,7 @@
 package com.fatihaltuntas.tabirbaz.repository
 
 import com.fatihaltuntas.tabirbaz.model.Dream
+import com.fatihaltuntas.tabirbaz.model.DreamCategory
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -111,11 +112,36 @@ class DreamRepository(
         dreamsCollection.document(dreamId).delete().await()
     }
 
+    // Kategorileri sadece isim olarak getir
     suspend fun getCategories(): List<String> {
         val querySnapshot = categoriesCollection.get().await()
         return querySnapshot.documents.mapNotNull { doc ->
             doc.getString("name")
         }
+    }
+    
+    // Kategorileri ID ve isim çiftleri olarak getir
+    suspend fun getCategoriesWithIds(): List<DreamCategory> {
+        val querySnapshot = categoriesCollection.orderBy("order", Query.Direction.ASCENDING).get().await()
+        return querySnapshot.documents.mapNotNull { doc ->
+            doc.toObject(DreamCategory::class.java)
+        }
+    }
+
+    // Rüya yorumla (AI entegrasyonu için hazırlık)
+    suspend fun interpretDream(dreamId: String, content: String): Dream {
+        // Gerçek AI entegrasyonu henüz yok, basit bir yorum ekleniyor
+        val dream = getDreamById(dreamId)
+        val interpretedDream = dream.copy(
+            interpretation = "Bu bir örnek yorumdur. AI entegrasyonu daha sonra eklenecektir.\n\n" +
+                    "Rüyanızdaki semboller çeşitli durumları temsil edebilir. $content içeriğindeki " +
+                    "detaylar geleceğe dair ipuçları içerebilir.",
+            updatedAt = Timestamp.now()
+        )
+        
+        val dreamData = interpretedDream.toMap()
+        dreamsCollection.document(dreamId).update(dreamData).await()
+        return interpretedDream
     }
 
     fun getCurrentUserId(): String? {

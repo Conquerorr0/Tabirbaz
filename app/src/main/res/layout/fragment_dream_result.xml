@@ -97,34 +97,80 @@
                 app:layout_constraintTop_toBottomOf="@+id/tvDreamContentLabel"
                 tools:text="Rüyamda gökyüzünde kollarımı açarak uçuyordum. Çok yükseklere çıkıyor ve şehrin üzerinde süzülüyordum. Kendimi çok özgür ve mutlu hissediyordum." />
 
-            <!-- Rüya Yorumu Başlık -->
-            <TextView
-                android:id="@+id/tvInterpretationLabel"
+            <!-- Yorumlama Butonu -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInterpret"
+                style="@style/Widget.Tabirbaz.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/dream_interpretation"
-                android:textColor="@color/text_primary_dark"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:text="Rüyanızı Yorumlayın"
+                android:textSize="16sp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvDreamContent" />
 
-            <!-- Rüya Yorumu -->
-            <TextView
-                android:id="@+id/tvInterpretation"
+            <!-- Yorumlama Yükleniyor -->
+            <FrameLayout
+                android:id="@+id/interpretLoadingLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_content_card"
+                android:layout_marginTop="24dp"
                 android:padding="16dp"
-                android:textColor="@color/text_secondary_dark"
-                android:textSize="16sp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvInterpretationLabel"
-                tools:text="Rüyada uçmak, genellikle özgürlük arzusu ve hayatta karşılaşılan kısıtlamalardan kurtulma isteğini simgeler. Gökyüzünde süzülmek, problemlerinizi çözebileceğiniz yeni bir perspektif kazandığınızı ve zorlukların üstesinden gelebileceğinizi gösterir. Bu rüya, kendinizi daha özgür ve bağımsız hissetme arzunuzu yansıtmaktadır." />
+                app:layout_constraintTop_toBottomOf="@+id/tvDreamContent">
+
+                <ProgressBar
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="64dp"
+                    android:text="Rüyanız yorumlanıyor..."
+                    android:textColor="@color/text_primary_dark"
+                    android:textSize="16sp" />
+            </FrameLayout>
+
+            <!-- Rüya Yorumu Bölümü -->
+            <LinearLayout
+                android:id="@+id/interpretationSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvDreamContent">
+
+                <!-- Rüya Yorumu Başlık -->
+                <TextView
+                    android:id="@+id/tvInterpretationLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dream_interpretation"
+                    android:textColor="@color/text_primary_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Rüya Yorumu -->
+                <TextView
+                    android:id="@+id/tvInterpretation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_content_card"
+                    android:padding="16dp"
+                    android:textColor="@color/text_secondary_dark"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
             <!-- Paylaş Butonu -->
             <com.google.android.material.button.MaterialButton
@@ -144,10 +190,9 @@
                 app:iconTint="@color/text_primary_dark"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvInterpretation" />
+                app:layout_constraintTop_toBottomOf="@+id/interpretationSection" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.core.widget.NestedScrollView>
 
     <!-- Yükleniyor göstergesi -->

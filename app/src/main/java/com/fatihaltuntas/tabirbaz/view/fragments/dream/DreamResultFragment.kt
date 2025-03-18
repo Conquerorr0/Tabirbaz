@@ -23,6 +23,8 @@ class DreamResultFragment : Fragment() {
     
     private lateinit var viewModel: DreamViewModel
     private val args: DreamResultFragmentArgs by navArgs()
+    private var dreamId: String? = null
+    private var dreamContent: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,9 +40,14 @@ class DreamResultFragment : Fragment() {
         // ViewModel'i başlat
         viewModel = ViewModelProvider(this, ViewModelFactory(requireActivity().application))[DreamViewModel::class.java]
         
+        // Fragment'a gönderilen rüya ID'sini al
+        dreamId = args.dreamId ?: arguments?.getString("dreamId")
+        
         setupToolbar()
         setupShareButton()
+        setupInterpretButton()
         loadDreamDetails()
+        observeViewModel()
     }
     
     private fun setupToolbar() {
@@ -55,11 +62,37 @@ class DreamResultFragment : Fragment() {
         }
     }
     
+    private fun setupInterpretButton() {
+        binding.btnInterpret.setOnClickListener {
+            interpretDream()
+        }
+    }
+    
+    private fun interpretDream() {
+        if (dreamId != null && dreamContent.isNotEmpty()) {
+            binding.interpretationSection.visibility = View.GONE
+            binding.interpretLoadingLayout.visibility = View.VISIBLE
+            
+            viewModel.interpretDream(dreamId!!, dreamContent)
+        } else {
+            Toast.makeText(requireContext(), "Rüya yorumlanamadı", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
     private fun loadDreamDetails() {
         binding.loadingLayout.visibility = View.VISIBLE
         binding.contentScrollView.visibility = View.GONE
         
-        viewModel.getDreamById(args.dreamId)
+        dreamId?.let {
+            viewModel.getDreamById(it)
+        } ?: run {
+            Toast.makeText(requireContext(), "Rüya ID'si bulunamadı", Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
+        }
+    }
+    
+    private fun observeViewModel() {
+        // Rüya detaylarını izle
         viewModel.dreamDetails.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -67,10 +100,21 @@ class DreamResultFragment : Fragment() {
                     binding.contentScrollView.visibility = View.VISIBLE
                     
                     resource.data?.let { dream ->
+                        dreamContent = dream.content
+                        
                         binding.tvDreamTitle.text = dream.title
                         binding.tvCategory.text = dream.categoryName
                         binding.tvDreamContent.text = dream.content
-                        binding.tvInterpretation.text = dream.interpretation
+                        
+                        // Yorum varsa göster, yoksa yorumlama butonunu göster
+                        if (dream.interpretation.isNotEmpty()) {
+                            binding.tvInterpretation.text = dream.interpretation
+                            binding.interpretationSection.visibility = View.VISIBLE
+                            binding.btnInterpret.visibility = View.GONE
+                        } else {
+                            binding.interpretationSection.visibility = View.GONE
+                            binding.btnInterpret.visibility = View.VISIBLE
+                        }
                     }
                 }
                 is Resource.Error -> {
@@ -84,6 +128,33 @@ class DreamResultFragment : Fragment() {
                 is Resource.Loading -> {
                     binding.loadingLayout.visibility = View.VISIBLE
                     binding.contentScrollView.visibility = View.GONE
+                }
+                else -> {}
+            }
+        }
+        
+        // Yorumlama durumunu izle
+        viewModel.interpretationStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    binding.interpretLoadingLayout.visibility = View.GONE
+                    binding.interpretationSection.visibility = View.VISIBLE
+                    binding.btnInterpret.visibility = View.GONE
+                    viewModel.resetInterpretationStatus()
+                }
+                is Resource.Error -> {
+                    binding.interpretLoadingLayout.visibility = View.GONE
+                    binding.btnInterpret.visibility = View.VISIBLE
+                    Toast.makeText(
+                        requireContext(),
+                        resource.message ?: getString(R.string.unknown_error),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    viewModel.resetInterpretationStatus()
+                }
+                is Resource.Loading -> {
+                    binding.interpretLoadingLayout.visibility = View.VISIBLE
+                    binding.btnInterpret.visibility = View.GONE
                 }
                 else -> {}
             }
