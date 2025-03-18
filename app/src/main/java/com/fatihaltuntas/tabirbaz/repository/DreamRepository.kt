@@ -217,4 +217,25 @@ class DreamRepository(
         
         return interpretation + "\n\nBu yorum, rüyanızdaki semboller ve temalar üzerine genel bir bakış sunmaktadır. Gerçek hayat durumunuza göre bu yorumu değerlendirmeniz önemlidir."
     }
+    
+    /**
+     * Kategoriye göre rüyaları getirir
+     */
+    suspend fun getDreamsByCategory(categoryId: String): List<Dream> = withContext(Dispatchers.IO) {
+        try {
+            val dreamDocs = firestore.collection(DREAMS_COLLECTION)
+                .whereEqualTo("categoryId", categoryId)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .await()
+                
+            val dreams = dreamDocs.toObjects(Dream::class.java)
+            
+            Log.d(TAG, "Kategoriye göre rüyalar getirildi. Kategori: $categoryId, Toplam: ${dreams.size}")
+            return@withContext dreams
+        } catch (e: Exception) {
+            Log.e(TAG, "Kategoriye göre rüyalar getirilirken hata oluştu", e)
+            throw e
+        }
+    }
 } 

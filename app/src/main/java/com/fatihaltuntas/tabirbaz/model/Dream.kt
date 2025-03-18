@@ -13,7 +13,9 @@ data class Dream(
     val createdAt: Timestamp = Timestamp.now(),
     val updatedAt: Timestamp = Timestamp.now(),
     val interpretation: String = "",
-    val featured: Boolean = false
+    val featured: Boolean = false,
+    val viewCount: Int = 0,
+    val likeCount: Int = 0
 ) : Serializable {
     fun toMap(): Map<String, Any> {
         return mapOf(
@@ -26,8 +28,8 @@ data class Dream(
             "interpretation" to interpretation,
             "isPublic" to false,
             "isFeatured" to featured,
-            "viewCount" to 0,
-            "likeCount" to 0,
+            "viewCount" to viewCount,
+            "likeCount" to likeCount,
             "createdAt" to createdAt,
             "updatedAt" to updatedAt
         )

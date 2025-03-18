@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentDreamDetailBinding
+import com.fatihaltuntas.tabirbaz.model.Dream
 import com.fatihaltuntas.tabirbaz.util.Resource
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
 import com.fatihaltuntas.tabirbaz.viewmodel.DreamDetailViewModel
@@ -86,20 +87,23 @@ class DreamDetailFragment : Fragment() {
     }
     
     private fun setupClickListeners() {
-        binding.btnShare.setOnClickListener {
+        binding.fabShare.setOnClickListener {
             shareDream()
         }
         
-        binding.btnInterpret?.setOnClickListener {
+        // Fab butonuna yorumlama özelliği ekleyeceğiz
+        binding.fabShare.setOnLongClickListener {
             interpretDream()
+            true
         }
     }
     
     private fun interpretDream() {
         if (dreamId != null && dreamContent.isNotEmpty()) {
-            binding.interpretationSection?.visibility = View.GONE
-            binding.interpretLoadingLayout?.visibility = View.VISIBLE
-            binding.btnInterpret?.visibility = View.GONE
+            // Yorum yükleniyor durumunu göster
+            binding.progressBar.visibility = View.VISIBLE
+            binding.tvInterpretationLabel.visibility = View.GONE
+            binding.tvInterpretation.visibility = View.GONE
             
             dreamViewModel.interpretDream(dreamId!!, dreamContent)
         } else {
@@ -111,19 +115,19 @@ class DreamDetailFragment : Fragment() {
         // Rüya yorumu sonucunu izle
         dreamViewModel.interpretationStatus.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success -> {
-                    binding.interpretLoadingLayout?.visibility = View.GONE
+                is Resource.Success<Dream> -> {
+                    binding.progressBar.visibility = View.GONE
                     
                     resource.data?.let { dream ->
-                        binding.tvInterpretation?.text = dream.interpretation
-                        binding.interpretationSection?.visibility = View.VISIBLE
+                        binding.tvInterpretation.text = dream.interpretation
+                        binding.tvInterpretationLabel.visibility = View.VISIBLE
+                        binding.tvInterpretation.visibility = View.VISIBLE
                     }
                     
                     dreamViewModel.resetInterpretationStatus()
                 }
                 is Resource.Error -> {
-                    binding.interpretLoadingLayout?.visibility = View.GONE
-                    binding.btnInterpret?.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
                     
                     Toast.makeText(
                         requireContext(),
@@ -134,38 +138,32 @@ class DreamDetailFragment : Fragment() {
                     dreamViewModel.resetInterpretationStatus()
                 }
                 is Resource.Loading -> {
-                    binding.interpretLoadingLayout?.visibility = View.VISIBLE
-                    binding.btnInterpret?.visibility = View.GONE
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 else -> {}
             }
         }
         
         // Rüya detaylarını izle
-        viewModel.dreamDetails.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    resource.data?.let { dream ->
-                        dreamContent = dream.content
-                        
-                        // Yorum varsa göster, yoksa yorumlama butonunu göster
-                        if (dream.interpretation.isNotEmpty()) {
-                            binding.tvInterpretation?.text = dream.interpretation
-                            binding.interpretationSection?.visibility = View.VISIBLE
-                            binding.btnInterpret?.visibility = View.GONE
-                        } else {
-                            binding.interpretationSection?.visibility = View.GONE
-                            binding.btnInterpret?.visibility = View.VISIBLE
-                        }
-                    }
+        viewModel.dream.observe(viewLifecycleOwner) { dream ->
+            dream?.let {
+                dreamContent = it.content
+                
+                // Yorum varsa göster, yoksa gizle
+                if (it.interpretation.isNotEmpty()) {
+                    binding.tvInterpretation.text = it.interpretation
+                    binding.tvInterpretationLabel.visibility = View.VISIBLE
+                    binding.tvInterpretation.visibility = View.VISIBLE
+                } else {
+                    binding.tvInterpretationLabel.visibility = View.GONE
+                    binding.tvInterpretation.visibility = View.GONE
                 }
-                else -> {}
             }
         }
     }
     
     private fun shareDream() {
-        viewModel.dreamDetails.value?.data?.let { dream ->
+        viewModel.dream.value?.let { dream ->
             val shareText = getString(
                 R.string.share_dream_text,
                 dream.title,
