@@ -1,35 +1,33 @@
 package com.fatihaltuntas.tabirbaz.model
 
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentId
-import java.util.Date
+import java.io.Serializable
 
 data class Dream(
-    @DocumentId
     val id: String = "",
     val userId: String = "",
     val title: String = "",
     val content: String = "",
-    val interpretation: String = "",
     val categoryId: String = "",
     val categoryName: String = "",
-    val viewCount: Int = 0,
-    val isFeatured: Boolean = false,
-    val isPublic: Boolean = true,
     val createdAt: Timestamp = Timestamp.now(),
-    val updatedAt: Timestamp = Timestamp.now()
-) {
-    fun toMap(): Map<String, Any?> {
+    val updatedAt: Timestamp = Timestamp.now(),
+    val interpretation: String = "",
+    val featured: Boolean = false
+) : Serializable {
+    fun toMap(): Map<String, Any> {
         return mapOf(
+            "id" to id,
             "userId" to userId,
             "title" to title,
             "content" to content,
-            "interpretation" to interpretation,
             "categoryId" to categoryId,
             "categoryName" to categoryName,
-            "viewCount" to viewCount,
-            "isFeatured" to isFeatured,
-            "isPublic" to isPublic,
+            "interpretation" to interpretation,
+            "isPublic" to false,
+            "isFeatured" to featured,
+            "viewCount" to 0,
+            "likeCount" to 0,
             "createdAt" to createdAt,
             "updatedAt" to updatedAt
         )

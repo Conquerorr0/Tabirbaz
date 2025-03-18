@@ -8,12 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fatihaltuntas.tabirbaz.R
 import com.fatihaltuntas.tabirbaz.databinding.FragmentDreamDetailBinding
+import com.fatihaltuntas.tabirbaz.util.Resource
 import com.fatihaltuntas.tabirbaz.view.adapters.DreamAdapter
 import com.fatihaltuntas.tabirbaz.viewmodel.DreamDetailViewModel
+import com.fatihaltuntas.tabirbaz.viewmodel.DreamViewModel
 import com.fatihaltuntas.tabirbaz.viewmodel.ViewModelFactory
 
 class DreamDetailFragment : Fragment() {
@@ -24,7 +27,9 @@ class DreamDetailFragment : Fragment() {
     private val viewModel: DreamDetailViewModel by viewModels { 
         ViewModelFactory(requireActivity().application) 
     }
+    private lateinit var dreamViewModel: DreamViewModel
     private var dreamId: String? = null
+    private var dreamContent: String = ""
     
     private lateinit var similarDreamsAdapter: DreamAdapter
 
@@ -42,6 +47,9 @@ class DreamDetailFragment : Fragment() {
         // Argümanları al
         dreamId = arguments?.getString("dreamId")
         
+        // DreamViewModel'i başlat
+        dreamViewModel = ViewModelProvider(this, ViewModelFactory(requireActivity().application))[DreamViewModel::class.java]
+        
         setupToolbar()
         setupAdapter()
         setupClickListeners()
@@ -49,13 +57,11 @@ class DreamDetailFragment : Fragment() {
         // Rüya detayını yükle
         dreamId?.let { 
             viewModel.loadDreamDetails(it)
+            observeInterpretation()
         } ?: run {
             Toast.makeText(requireContext(), "Rüya ID'si bulunamadı", Toast.LENGTH_SHORT).show()
             findNavController().navigateUp()
         }
-        
-        // ViewModel'daki verileri izle
-        setupObservers()
     }
     
     private fun setupToolbar() {
@@ -65,10 +71,10 @@ class DreamDetailFragment : Fragment() {
     }
     
     private fun setupAdapter() {
-        similarDreamsAdapter = DreamAdapter { dream ->
-            // Benzer rüyaya tıklandığında o rüyanın detayına git
+        similarDreamsAdapter = DreamAdapter { clickedDream ->
+            // Benzer rüyaya tıklandığında detay sayfasına yönlendir
             val bundle = Bundle().apply {
-                putString("dreamId", dream.id)
+                putString("dreamId", clickedDream.id)
             }
             findNavController().navigate(R.id.dreamDetailFragment, bundle)
         }
@@ -80,47 +86,86 @@ class DreamDetailFragment : Fragment() {
     }
     
     private fun setupClickListeners() {
-        // Paylaş butonuna tıklandığında içeriği paylaş
-        binding.fabShare.setOnClickListener {
-            shareCurrentDream()
+        binding.btnShare.setOnClickListener {
+            shareDream()
+        }
+        
+        binding.btnInterpret?.setOnClickListener {
+            interpretDream()
         }
     }
     
-    private fun setupObservers() {
-        // Rüya detayını izle
-        viewModel.dream.observe(viewLifecycleOwner) { dream ->
-            dream?.let {
-                binding.tvDreamTitle.text = it.title
-                binding.tvCategory.text = it.categoryName
-                binding.tvViewCount.text = it.viewCount.toString()
-                binding.tvDreamContent.text = it.content
-                binding.tvInterpretation.text = it.interpretation
+    private fun interpretDream() {
+        if (dreamId != null && dreamContent.isNotEmpty()) {
+            binding.interpretationSection?.visibility = View.GONE
+            binding.interpretLoadingLayout?.visibility = View.VISIBLE
+            binding.btnInterpret?.visibility = View.GONE
+            
+            dreamViewModel.interpretDream(dreamId!!, dreamContent)
+        } else {
+            Toast.makeText(requireContext(), "Rüya yorumlanamadı", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun observeInterpretation() {
+        // Rüya yorumu sonucunu izle
+        dreamViewModel.interpretationStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    binding.interpretLoadingLayout?.visibility = View.GONE
+                    
+                    resource.data?.let { dream ->
+                        binding.tvInterpretation?.text = dream.interpretation
+                        binding.interpretationSection?.visibility = View.VISIBLE
+                    }
+                    
+                    dreamViewModel.resetInterpretationStatus()
+                }
+                is Resource.Error -> {
+                    binding.interpretLoadingLayout?.visibility = View.GONE
+                    binding.btnInterpret?.visibility = View.VISIBLE
+                    
+                    Toast.makeText(
+                        requireContext(),
+                        resource.message ?: getString(R.string.unknown_error),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    dreamViewModel.resetInterpretationStatus()
+                }
+                is Resource.Loading -> {
+                    binding.interpretLoadingLayout?.visibility = View.VISIBLE
+                    binding.btnInterpret?.visibility = View.GONE
+                }
+                else -> {}
             }
         }
         
-        // Benzer rüyaları izle
-        viewModel.similarDreams.observe(viewLifecycleOwner) { dreams ->
-            similarDreamsAdapter.submitList(dreams)
-            binding.tvSimilarDreamsLabel.visibility = if (dreams.isEmpty()) View.GONE else View.VISIBLE
-            binding.rvSimilarDreams.visibility = if (dreams.isEmpty()) View.GONE else View.VISIBLE
-        }
-        
-        // Yükleme durumunu izle
-        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-        }
-        
-        // Hata durumunu izle
-        viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-                viewModel.clearError()
+        // Rüya detaylarını izle
+        viewModel.dreamDetails.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    resource.data?.let { dream ->
+                        dreamContent = dream.content
+                        
+                        // Yorum varsa göster, yoksa yorumlama butonunu göster
+                        if (dream.interpretation.isNotEmpty()) {
+                            binding.tvInterpretation?.text = dream.interpretation
+                            binding.interpretationSection?.visibility = View.VISIBLE
+                            binding.btnInterpret?.visibility = View.GONE
+                        } else {
+                            binding.interpretationSection?.visibility = View.GONE
+                            binding.btnInterpret?.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                else -> {}
             }
         }
     }
     
-    private fun shareCurrentDream() {
-        viewModel.dream.value?.let { dream ->
+    private fun shareDream() {
+        viewModel.dreamDetails.value?.data?.let { dream ->
             val shareText = getString(
                 R.string.share_dream_text,
                 dream.title,
@@ -128,14 +173,13 @@ class DreamDetailFragment : Fragment() {
                 dream.interpretation
             )
             
-            val sendIntent = Intent().apply {
+            val shareIntent = Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_TEXT, shareText)
                 type = "text/plain"
             }
             
-            val shareIntent = Intent.createChooser(sendIntent, getString(R.string.share_dream))
-            startActivity(shareIntent)
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_dream)))
         }
     }
 

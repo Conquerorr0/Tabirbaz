@@ -1,5 +1,6 @@
 package com.fatihaltuntas.tabirbaz.model
 
+import java.io.Serializable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 
@@ -12,7 +13,7 @@ data class DreamCategory(
     val order: Int = 0,
     val createdAt: Timestamp = Timestamp.now(),
     val updatedAt: Timestamp = Timestamp.now()
-) {
+) : Serializable {
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "name" to name,
